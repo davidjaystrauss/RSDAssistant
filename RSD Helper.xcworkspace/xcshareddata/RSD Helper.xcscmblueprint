@@ -1,0 +1,43 @@
+{
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "D4E844A38B02DF15262DCE783768C59E44A4BC90" : 9223372036854775807,
+    "17FB51EC7B87DC25DD21E28FDFD877B479CFFAC1" : 9223372036854775807,
+    "BC6CA7FA43136695A950882EDF22DD3321E8D48F" : 9223372036854775807,
+    "B18F135FF9971CA4D146D4D0919B68C532E251FE" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "4180BBE9-A421-4E98-ABF7-C7D4EB98ED6C",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "D4E844A38B02DF15262DCE783768C59E44A4BC90" : "RSD%20Helper\/MPParallaxView\/",
+    "17FB51EC7B87DC25DD21E28FDFD877B479CFFAC1" : "RSD%20Helper\/Kingfisher\/",
+    "BC6CA7FA43136695A950882EDF22DD3321E8D48F" : "RSD%20Helper\/iTunesSearchAPI\/",
+    "B18F135FF9971CA4D146D4D0919B68C532E251FE" : "RSD%20Helper\/TVButton\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "RSD Helper",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "RSD Helper.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/onevcat\/Kingfisher.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "17FB51EC7B87DC25DD21E28FDFD877B479CFFAC1"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/marmelroy\/TVButton.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "B18F135FF9971CA4D146D4D0919B68C532E251FE"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/svenbacia\/iTunesSearchAPI.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "BC6CA7FA43136695A950882EDF22DD3321E8D48F"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/DroidsOnRoids\/MPParallaxView.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "D4E844A38B02DF15262DCE783768C59E44A4BC90"
+    }
+  ]
+}

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Firebase
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -14,8 +15,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        FirebaseApp.configure()
         return true
     }
 
@@ -40,7 +42,48 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    
+    func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+        
+        completionHandler(handleQuickAction(shortcutItem: shortcutItem))
+        
+    }
 
+    enum Shortcut: String {
+        case favorites = "Favorites"
+        case locator = "Find A Store"
+    }
+    
+    func handleQuickAction(shortcutItem: UIApplicationShortcutItem) -> Bool {
+        
+        var quickActionHandled = false
+        let type = shortcutItem.type.components(separatedBy: ".").last
+        if let shortcutType = Shortcut.init(rawValue: type!) {
+            switch shortcutType {
+            case .favorites:
+                
+                let nextController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RSDFavoritesViewController") as? RSDFavoritesViewController
+                if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RSDViewController") as? RSDViewController {
+                    if let window = self.window, let rootViewController = window.rootViewController as? UINavigationController {
+                        rootViewController.pushViewController(nextController!, animated: true)
+                    }
+                }
+                
+                quickActionHandled = true
+            case .locator:
+                
+                let nextController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RSDStoreMapViewController") as? RSDStoreMapViewController
+                if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RSDViewController") as? RSDViewController {
+                    if let window = self.window, let rootViewController = window.rootViewController as? UINavigationController {
+                        rootViewController.pushViewController(nextController!, animated: true)
+                    }
+                }
+                
+            }
+        }
+        
+        return quickActionHandled
+    }
 
 }
 

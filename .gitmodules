@@ -1,0 +1,16 @@
+
+[submodule "MPParallaxView"]
+	path = MPParallaxView
+	url = https://github.com/DroidsOnRoids/MPParallaxView.git
+[submodule "TVButton"]
+	path = TVButton
+	url = https://github.com/marmelroy/TVButton.git
+[submodule "SDWebImage"]
+	path = SDWebImage
+	url = https://github.com/rs/SDWebImage.git
+[submodule "Kingfisher"]
+	path = Kingfisher
+	url = https://github.com/onevcat/Kingfisher.git
+[submodule "iTunesSearchAPI"]
+	path = iTunesSearchAPI
+	url = https://github.com/svenbacia/iTunesSearchAPI.git
