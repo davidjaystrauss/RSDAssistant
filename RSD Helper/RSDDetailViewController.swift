@@ -110,7 +110,11 @@ struct ReleaseDetailView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    RemoteArtworkView(urlString: listing.photoURL, priority: .high)
+                    RemoteArtworkView(
+                        urlString: listing.photoURL,
+                        placeholderStyle: .from(format: listing.format),
+                        priority: .high
+                    )
                     .frame(width: 320, height: 320)
                     .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                     .frame(maxWidth: .infinity)

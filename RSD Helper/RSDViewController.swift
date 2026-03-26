@@ -755,8 +755,69 @@ final class ArtworkLoader: ObservableObject {
     }
 }
 
+struct RSDRecordPlaceholderStyle: Equatable {
+    let discCount: Int
+    let sizeScale: CGFloat
+
+    static let standard = RSDRecordPlaceholderStyle(discCount: 1, sizeScale: 1)
+
+    static func from(format: String) -> RSDRecordPlaceholderStyle {
+        let normalized = format
+            .lowercased()
+            .replacingOccurrences(of: "×", with: "x")
+            .replacingOccurrences(of: "”", with: "\"")
+            .replacingOccurrences(of: "″", with: "\"")
+            .replacingOccurrences(of: "’", with: "'")
+
+        let discCount = parsedDiscCount(from: normalized)
+        let isSevenInch = normalized.range(of: #"\b7\s*(\"|inch|in)\b"#, options: .regularExpression) != nil
+            || normalized.contains("7-inch")
+            || normalized.contains("7 inch")
+
+        return RSDRecordPlaceholderStyle(
+            discCount: min(max(discCount, 1), 3),
+            sizeScale: isSevenInch ? 0.76 : 1
+        )
+    }
+
+    private static func parsedDiscCount(from normalizedFormat: String) -> Int {
+        let patterns = [
+            #"\b([2-9])\s*x\s*lp\b"#,
+            #"\b([2-9])\s*lp\b"#,
+            #"\b([2-9])lp\b"#,
+        ]
+
+        for pattern in patterns {
+            guard let expression = try? NSRegularExpression(pattern: pattern, options: []) else {
+                continue
+            }
+
+            let range = NSRange(normalizedFormat.startIndex..., in: normalizedFormat)
+            guard let match = expression.firstMatch(in: normalizedFormat, options: [], range: range),
+                  let captureRange = Range(match.range(at: 1), in: normalizedFormat),
+                  let value = Int(normalizedFormat[captureRange]) else {
+                continue
+            }
+            return value
+        }
+
+        if normalizedFormat.contains("double lp") {
+            return 2
+        }
+        if normalizedFormat.contains("triple lp") {
+            return 3
+        }
+
+        return 1
+    }
+}
+
 enum RSDPlaceholderArt {
-    static func image(size: CGFloat = 240, userInterfaceStyle: UIUserInterfaceStyle = .unspecified) -> UIImage {
+    static func image(
+        size: CGFloat = 240,
+        style: RSDRecordPlaceholderStyle = .standard,
+        userInterfaceStyle: UIUserInterfaceStyle = .unspecified
+    ) -> UIImage {
         let resolvedTraits = UITraitCollection(userInterfaceStyle: userInterfaceStyle)
         let colorScheme: ColorScheme = userInterfaceStyle == .dark ? .dark : .light
         let palette = RSDAppState.shared.selectedList.theme.palette(for: colorScheme)
@@ -801,46 +862,98 @@ enum RSDPlaceholderArt {
             panelPath.lineWidth = 1
             panelPath.stroke()
 
-            let recordCenter = CGPoint(x: size * 0.5, y: size * 0.5)
-            let recordRadius = size * 0.39
             let colorSpace = CGColorSpaceCreateDeviceRGB()
             let recordGradient = CGGradient(colorsSpace: colorSpace, colors: recordGradientColors as CFArray, locations: [0.0, 0.52, 1.0])!
-            cgContext.saveGState()
-            UIBezierPath(arcCenter: recordCenter, radius: recordRadius, startAngle: 0, endAngle: .pi * 2, clockwise: true).addClip()
-            cgContext.drawRadialGradient(
-                recordGradient,
-                startCenter: CGPoint(x: recordCenter.x - size * 0.035, y: recordCenter.y - size * 0.08),
-                startRadius: 0,
-                endCenter: recordCenter,
-                endRadius: recordRadius,
-                options: []
-            )
-            cgContext.restoreGState()
+            let discLayouts = discLayouts(for: style.discCount)
+            let baseRadius = size * 0.39 * style.sizeScale
 
-            ringColor.setStroke()
-            for radius in [recordRadius * 0.78, recordRadius * 0.6] {
-                let path = UIBezierPath(arcCenter: recordCenter, radius: radius, startAngle: 0, endAngle: .pi * 2, clockwise: true)
-                path.lineWidth = size * 0.014
-                path.stroke()
+            for layout in discLayouts {
+                let recordCenter = CGPoint(
+                    x: size * 0.5 + layout.offset.width * size,
+                    y: size * 0.5 + layout.offset.height * size
+                )
+                drawRecord(
+                    in: cgContext,
+                    center: recordCenter,
+                    radius: baseRadius,
+                    size: size,
+                    gradient: recordGradient,
+                    ringColor: ringColor.withAlphaComponent(layout.alpha),
+                    innerRingColor: innerRingColor.withAlphaComponent(layout.alpha),
+                    labelColor: UIColor(white: 0.76, alpha: 0.74 * layout.alpha),
+                    centerColor: UIColor.white.withAlphaComponent((userInterfaceStyle == .dark ? 0.94 : 0.9) * layout.alpha),
+                    spindleColor: UIColor(white: 0.25, alpha: layout.alpha)
+                )
             }
-
-            innerRingColor.setStroke()
-            let innerGroove = UIBezierPath(arcCenter: recordCenter, radius: recordRadius * 0.45, startAngle: 0, endAngle: .pi * 2, clockwise: true)
-            innerGroove.lineWidth = size * 0.01
-            innerGroove.stroke()
-
-            UIColor(white: 0.76, alpha: 0.74).setFill()
-            UIBezierPath(arcCenter: recordCenter, radius: recordRadius * 0.36, startAngle: 0, endAngle: .pi * 2, clockwise: true).fill()
-            UIColor.white.withAlphaComponent(userInterfaceStyle == .dark ? 0.94 : 0.9).setFill()
-            UIBezierPath(arcCenter: recordCenter, radius: recordRadius * 0.085, startAngle: 0, endAngle: .pi * 2, clockwise: true).fill()
-            UIColor(white: 0.25, alpha: 1).setFill()
-            UIBezierPath(arcCenter: recordCenter, radius: recordRadius * 0.028, startAngle: 0, endAngle: .pi * 2, clockwise: true).fill()
         }
+    }
+
+    private static func discLayouts(for discCount: Int) -> [(offset: CGSize, alpha: CGFloat)] {
+        switch discCount {
+        case 2:
+            return [
+                (CGSize(width: -0.07, height: -0.015), 0.74),
+                (CGSize(width: 0.065, height: 0.03), 1.0),
+            ]
+        case 3:
+            return [
+                (CGSize(width: -0.11, height: -0.03), 0.62),
+                (CGSize(width: 0, height: 0), 0.8),
+                (CGSize(width: 0.11, height: 0.03), 1.0),
+            ]
+        default:
+            return [(CGSize.zero, 1.0)]
+        }
+    }
+
+    private static func drawRecord(
+        in cgContext: CGContext,
+        center: CGPoint,
+        radius: CGFloat,
+        size: CGFloat,
+        gradient: CGGradient,
+        ringColor: UIColor,
+        innerRingColor: UIColor,
+        labelColor: UIColor,
+        centerColor: UIColor,
+        spindleColor: UIColor
+    ) {
+        cgContext.saveGState()
+        UIBezierPath(arcCenter: center, radius: radius, startAngle: 0, endAngle: .pi * 2, clockwise: true).addClip()
+        cgContext.drawRadialGradient(
+            gradient,
+            startCenter: CGPoint(x: center.x - size * 0.035, y: center.y - size * 0.08),
+            startRadius: 0,
+            endCenter: center,
+            endRadius: radius,
+            options: []
+        )
+        cgContext.restoreGState()
+
+        ringColor.setStroke()
+        for radiusMultiplier in [0.82, 0.68, 0.54] {
+            let path = UIBezierPath(arcCenter: center, radius: radius * radiusMultiplier, startAngle: 0, endAngle: .pi * 2, clockwise: true)
+            path.lineWidth = size * 0.011
+            path.stroke()
+        }
+
+        innerRingColor.setStroke()
+        let innerGroove = UIBezierPath(arcCenter: center, radius: radius * 0.4, startAngle: 0, endAngle: .pi * 2, clockwise: true)
+        innerGroove.lineWidth = size * 0.008
+        innerGroove.stroke()
+
+        labelColor.setFill()
+        UIBezierPath(arcCenter: center, radius: radius * 0.3, startAngle: 0, endAngle: .pi * 2, clockwise: true).fill()
+        centerColor.setFill()
+        UIBezierPath(arcCenter: center, radius: radius * 0.078, startAngle: 0, endAngle: .pi * 2, clockwise: true).fill()
+        spindleColor.setFill()
+        UIBezierPath(arcCenter: center, radius: radius * 0.026, startAngle: 0, endAngle: .pi * 2, clockwise: true).fill()
     }
 }
 
 struct RSDRecordToteMark: View {
     let animated: Bool
+    let style: RSDRecordPlaceholderStyle
     @ObservedObject private var appState = RSDAppState.shared
     @Environment(\.colorScheme) private var colorScheme
     @State private var loaderScale: CGFloat = 0.96
@@ -880,18 +993,16 @@ struct RSDRecordToteMark: View {
                 RoundedRectangle(cornerRadius: size * 0.12, style: .continuous)
                     .stroke(SwiftUI.Color.primary.opacity(colorScheme == .dark ? 0.16 : 0.08), lineWidth: 1)
 
-                Circle()
-                    .fill(recordFill)
-                    .frame(width: size * 0.78, height: size * 0.78)
-                    .overlay {
-                        Circle().stroke(SwiftUI.Color.white.opacity(0.58), lineWidth: size * 0.014).padding(size * 0.085)
-                        Circle().stroke(SwiftUI.Color.white.opacity(0.18), lineWidth: size * 0.01).padding(size * 0.145)
-                        Circle().fill(SwiftUI.Color(white: 0.68).opacity(0.74)).frame(width: size * 0.22, height: size * 0.22)
-                        Circle().fill(SwiftUI.Color.white.opacity(0.9)).frame(width: size * 0.058, height: size * 0.058)
-                        Circle().fill(SwiftUI.Color(white: 0.24)).frame(width: size * 0.016, height: size * 0.016)
+                ZStack {
+                    ForEach(Array(discLayouts.enumerated()), id: \.offset) { entry in
+                        let layout = entry.element
+                        recordDiscView(size: size, fill: recordFill)
+                            .opacity(layout.opacity)
+                            .offset(x: layout.offset.width * size, y: layout.offset.height * size)
                     }
-                    .scaleEffect(animated ? loaderScale : 1)
-                    .opacity(animated ? loaderOpacity : 1)
+                }
+                .scaleEffect(animated ? loaderScale : 1)
+                .opacity(animated ? loaderOpacity : 1)
             }
             .onAppear {
                 guard animated else { return }
@@ -903,20 +1014,59 @@ struct RSDRecordToteMark: View {
         }
         .aspectRatio(1, contentMode: .fit)
     }
+
+    private var discLayouts: [(offset: CGSize, opacity: Double)] {
+        switch style.discCount {
+        case 2:
+            return [
+                (CGSize(width: -0.07, height: -0.015), 0.74),
+                (CGSize(width: 0.065, height: 0.03), 1.0),
+            ]
+        case 3:
+            return [
+                (CGSize(width: -0.11, height: -0.03), 0.62),
+                (CGSize(width: 0, height: 0), 0.8),
+                (CGSize(width: 0.11, height: 0.03), 1.0),
+            ]
+        default:
+            return [(CGSize.zero, 1.0)]
+        }
+    }
+
+    @ViewBuilder
+    private func recordDiscView(size: CGFloat, fill: RadialGradient) -> some View {
+        let discSize = size * 0.78 * style.sizeScale
+
+        Circle()
+            .fill(fill)
+            .frame(width: discSize, height: discSize)
+            .overlay {
+                Circle().stroke(SwiftUI.Color.white.opacity(0.58), lineWidth: size * 0.011).padding(discSize * 0.09)
+                Circle().stroke(SwiftUI.Color.white.opacity(0.34), lineWidth: size * 0.011).padding(discSize * 0.16)
+                Circle().stroke(SwiftUI.Color.white.opacity(0.18), lineWidth: size * 0.01).padding(discSize * 0.23)
+                Circle().stroke(SwiftUI.Color.white.opacity(0.14), lineWidth: size * 0.008).padding(discSize * 0.3)
+                Circle().fill(SwiftUI.Color(white: 0.68).opacity(0.74)).frame(width: discSize * 0.3, height: discSize * 0.3)
+                Circle().fill(SwiftUI.Color.white.opacity(0.9)).frame(width: discSize * 0.078, height: discSize * 0.078)
+                Circle().fill(SwiftUI.Color(white: 0.24)).frame(width: discSize * 0.026, height: discSize * 0.026)
+            }
+    }
 }
 
 struct RemoteArtworkView: View {
     let urlString: String
     let contentMode: SwiftUI.ContentMode
+    let placeholderStyle: RSDRecordPlaceholderStyle
     @StateObject private var loader: ArtworkLoader
 
     init(
         urlString: String,
         contentMode: SwiftUI.ContentMode = .fill,
+        placeholderStyle: RSDRecordPlaceholderStyle = .standard,
         priority: ArtworkPipeline.LoadPriority = .normal
     ) {
         self.urlString = urlString
         self.contentMode = contentMode
+        self.placeholderStyle = placeholderStyle
         _loader = StateObject(wrappedValue: ArtworkLoader(urlString: urlString, priority: priority))
     }
 
@@ -943,7 +1093,7 @@ struct RemoteArtworkView: View {
     }
 
     private func placeholder(animated: Bool) -> some View {
-        RSDRecordToteMark(animated: animated)
+        RSDRecordToteMark(animated: animated, style: placeholderStyle)
     }
 }
 
@@ -956,7 +1106,7 @@ struct ReleaseRowView: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            RemoteArtworkView(urlString: listing.photoURL)
+            RemoteArtworkView(urlString: listing.photoURL, placeholderStyle: .from(format: listing.format))
                 .frame(width: 68, height: 68)
                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
@@ -1007,7 +1157,11 @@ struct ReleaseGridCardView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            RemoteArtworkView(urlString: listing.photoURL, contentMode: .fit)
+            RemoteArtworkView(
+                urlString: listing.photoURL,
+                contentMode: .fit,
+                placeholderStyle: .from(format: listing.format)
+            )
                 .frame(width: artworkSize, height: artworkSize)
                 .frame(maxWidth: .infinity)
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -1063,7 +1217,11 @@ struct CoverFlowCardView: View {
     var body: some View {
         VStack(spacing: prefersCompactArtwork ? 10 : 14) {
             SwiftUI.Button(action: onTap) {
-                RemoteArtworkView(urlString: listing.photoURL, contentMode: .fit)
+                RemoteArtworkView(
+                    urlString: listing.photoURL,
+                    contentMode: .fit,
+                    placeholderStyle: .from(format: listing.format)
+                )
                     .frame(width: artworkDimension, height: artworkDimension)
                     .background(SwiftUI.Color(.secondarySystemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))

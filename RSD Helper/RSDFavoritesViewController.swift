@@ -37,31 +37,39 @@ struct FavoritesView: View {
             Group {
                 if isImmersiveCoverFlow {
                     NavigationStack {
-                        favoritesContent(isImmersiveCoverFlow: true, isLandscape: isLandscape)
-                            .navigationTitle("Favorites")
-                            .navigationBarTitleDisplayMode(.large)
-                            .toolbar(.hidden, for: .navigationBar)
-                            .tint(theme.tint)
-                            .accentColor(theme.tint)
+                        favoritesContent(
+                            isImmersiveCoverFlow: true,
+                            isLandscape: isLandscape,
+                            availableWidth: geometry.size.width
+                        )
+                        .navigationTitle("Favorites")
+                        .navigationBarTitleDisplayMode(.large)
+                        .toolbar(.hidden, for: .navigationBar)
+                        .tint(theme.tint)
+                        .accentColor(theme.tint)
                     }
                 } else {
                     NavigationStack {
-                        favoritesContent(isImmersiveCoverFlow: false, isLandscape: isLandscape)
-                            .navigationTitle("Favorites")
-                            .navigationBarTitleDisplayMode(.large)
-                            .modifier(FavoritesSearchModifier(isEnabled: true, text: $searchText))
-                            .background(
-                                FavoritesNavigationBarConfigurator(
-                                    backgroundColor: UIColor(theme.navigationBar),
-                                    titleColor: colorScheme == .dark ? .white : .label,
-                                    tintColor: UIColor(theme.tint)
-                                )
+                        favoritesContent(
+                            isImmersiveCoverFlow: false,
+                            isLandscape: isLandscape,
+                            availableWidth: geometry.size.width
+                        )
+                        .navigationTitle("Favorites")
+                        .navigationBarTitleDisplayMode(.large)
+                        .modifier(FavoritesSearchModifier(isEnabled: true, text: $searchText))
+                        .background(
+                            FavoritesNavigationBarConfigurator(
+                                backgroundColor: UIColor(theme.navigationBar),
+                                titleColor: colorScheme == .dark ? .white : .label,
+                                tintColor: UIColor(theme.tint)
                             )
-                            .toolbarBackground(AnyShapeStyle(theme.navigationBar), for: .navigationBar)
-                            .toolbarBackground(.visible, for: .navigationBar)
-                            .tint(theme.tint)
-                            .accentColor(theme.tint)
-                            .toolbar(content: toolbarContent)
+                        )
+                        .toolbarBackground(AnyShapeStyle(theme.navigationBar), for: .navigationBar)
+                        .toolbarBackground(.visible, for: .navigationBar)
+                        .tint(theme.tint)
+                        .accentColor(theme.tint)
+                        .toolbar(content: toolbarContent)
                     }
                 }
             }
@@ -81,8 +89,16 @@ struct FavoritesView: View {
 #endif
     }
 
-    private func favoritesContent(isImmersiveCoverFlow: Bool, isLandscape: Bool) -> some View {
-        ZStack {
+    private func favoritesContent(
+        isImmersiveCoverFlow: Bool,
+        isLandscape: Bool,
+        availableWidth: CGFloat
+    ) -> some View {
+        let isRoomyCanvas = availableWidth >= 820
+        let listRowHorizontalInset = isRoomyCanvas ? 24.0 : 16.0
+        let listRowVerticalInset = isRoomyCanvas ? 8.0 : 4.0
+
+        return ZStack {
             LinearGradient(
                 colors: [theme.backgroundTop, theme.backgroundBottom],
                 startPoint: .topLeading,
@@ -105,24 +121,35 @@ struct FavoritesView: View {
                     case .list:
                         List(filteredFavorites) { listing in
                             favoriteRowNavigation(for: listing)
-                                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                                .listRowInsets(EdgeInsets(
+                                    top: listRowVerticalInset,
+                                    leading: listRowHorizontalInset,
+                                    bottom: listRowVerticalInset,
+                                    trailing: listRowHorizontalInset
+                                ))
                                 .listRowBackground(SwiftUI.Color.clear)
                         }
                         .listStyle(PlainListStyle())
                         .scrollContentBackground(.hidden)
 
                     case .grid:
-                        let columnSpacing = isLandscape ? 22.0 : 16.0
-                        let rowSpacing = isLandscape ? 24.0 : 18.0
-                        let contentPadding = isLandscape ? 12.0 : 16.0
+                        let minimumCardWidth = isRoomyCanvas ? 184.0 : 160.0
+                        let columnSpacing = isRoomyCanvas ? 28.0 : (isLandscape ? 22.0 : 16.0)
+                        let rowSpacing = isRoomyCanvas ? 30.0 : (isLandscape ? 24.0 : 18.0)
+                        let horizontalPadding = isRoomyCanvas ? 48.0 : (isLandscape ? 12.0 : 16.0)
+                        let verticalPadding = isRoomyCanvas ? 24.0 : (isLandscape ? 12.0 : 16.0)
                         ScrollView {
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: columnSpacing)], spacing: rowSpacing) {
+                            LazyVGrid(
+                                columns: [GridItem(.adaptive(minimum: minimumCardWidth), spacing: columnSpacing)],
+                                spacing: rowSpacing
+                            ) {
                                 ForEach(filteredFavorites) { listing in
                                     favoriteGridNavigation(for: listing)
                                         .buttonStyle(.plain)
                                 }
                             }
-                            .padding(contentPadding)
+                            .padding(.horizontal, horizontalPadding)
+                            .padding(.vertical, verticalPadding)
                         }
 
                     case .coverFlow:
@@ -475,7 +502,11 @@ enum FavoriteExportBuilder {
 
                 while rowIndex < listings.count {
                     let listing = listings[rowIndex]
-                    let artworkImage = artworkImages[listing.id] ?? RSDPlaceholderArt.image(size: 220, userInterfaceStyle: .light)
+                    let artworkImage = artworkImages[listing.id] ?? RSDPlaceholderArt.image(
+                        size: 220,
+                        style: .from(format: listing.format),
+                        userInterfaceStyle: .light
+                    )
                     let measuredRowHeight = rowHeight(
                         for: listing,
                         columns: columnSpecs,
@@ -602,7 +633,11 @@ enum FavoriteExportBuilder {
 
     private static func artworkImage(for listing: Listing) async -> UIImage? {
         guard let url = URL(string: listing.photoURL), listing.photoURL.isEmpty == false else {
-            return RSDPlaceholderArt.image(size: 220, userInterfaceStyle: .light)
+            return RSDPlaceholderArt.image(
+                size: 220,
+                style: .from(format: listing.format),
+                userInterfaceStyle: .light
+            )
         }
 
         if let cached = ArtworkPipeline.shared.cachedImage(for: url) {
