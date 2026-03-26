@@ -204,6 +204,16 @@ Branding and icon exploration lives in:
 - continue expanding international store coverage
 - adopt Tahoe / iOS 26 visual APIs after the current baseline is committed
 
+## TODO
+
+- add a `Share Release` action from the detail screen
+- add `Copy Address` / explicit map-app choices from the participating stores UI
+- add a one-tap `Reset filters and sort` action in releases
+- add a `Favorites first` or `Hide favorited` browsing mode for the main releases list
+- improve empty states for filtered stores and empty-search results
+- run a final accessibility pass for Dynamic Type, VoiceOver labels, and contrast
+- run a final resize/layout pass on iPhone, iPad, and Mac Catalyst across list, grid, and cover flow
+
 ## License / Ownership
 
 This repository contains application code by David Strauss and imported third-party source trees with their own licenses and readmes. Review the vendored library folders before redistributing those components separately.
