@@ -1,0 +1,72 @@
+{
+  "event": {
+    "slug": "rsd-2026",
+    "name": "Record Store Day 2026",
+    "releaseDate": "2026-04-18"
+  },
+  "regions": [
+    {
+      "slug": "us",
+      "name": "United States / Global",
+      "status": "confirmed",
+      "sourceURL": "https://recordstoreday.com/SpecialReleases",
+      "notes": "Primary official list source on the main Record Store Day site."
+    },
+    {
+      "slug": "canada",
+      "name": "Canada",
+      "status": "confirmed",
+      "sourceURL": "https://recordstoredaycanada.ca/record-store-day-2026/index.php",
+      "notes": "Official Canada list with Canadian-only titles marked on the page and PDF."
+    },
+    {
+      "slug": "uk",
+      "name": "United Kingdom",
+      "status": "confirmed",
+      "sourceURL": "https://www.recordstoreday.co.uk/rsd-list",
+      "notes": "Official UK list with detail pages per release."
+    },
+    {
+      "slug": "germany",
+      "name": "Germany / Austria / Switzerland",
+      "status": "confirmed",
+      "sourceURL": "https://www.recordstoredaygermany.de/exklusive-releases/releases-zum-rsd-2026/",
+      "notes": "Official DACH release list."
+    },
+    {
+      "slug": "australia",
+      "name": "Australia",
+      "status": "confirmed",
+      "sourceURL": "https://recordstoreday.com.au/releases/",
+      "notes": "Official Australia release list with additional PDF list pages."
+    },
+    {
+      "slug": "japan",
+      "name": "Japan",
+      "status": "confirmed",
+      "sourceURL": "https://recordstoreday.jp/item2026/",
+      "notes": "Official Japan 2026 item index on the Record Store Day Japan site."
+    },
+    {
+      "slug": "spain",
+      "name": "Spain",
+      "status": "unconfirmed",
+      "sourceURL": "https://www.recordstoreday.es/",
+      "notes": "Official Spain site confirmed, but the 2026 release-list endpoint still needs to be identified."
+    },
+    {
+      "slug": "france",
+      "name": "France",
+      "status": "unconfirmed",
+      "sourceURL": null,
+      "notes": "No confirmed official 2026 public list source yet."
+    },
+    {
+      "slug": "italy",
+      "name": "Italy",
+      "status": "unconfirmed",
+      "sourceURL": null,
+      "notes": "No confirmed official 2026 public list source yet."
+    }
+  ]
+}

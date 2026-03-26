@@ -1,0 +1,188 @@
+{
+  "items": [
+    {
+      "sourceFile": "2025-canada-main.pdf",
+      "eventSlug": "rsd-2025-canada",
+      "year": 2025,
+      "country": "Canada",
+      "season": "Main",
+      "eventName": "Record Store Day Canada 2025"
+    },
+    {
+      "sourceFile": "2025-australia-main.pdf",
+      "eventSlug": "rsd-2025-australia",
+      "year": 2025,
+      "country": "Australia",
+      "season": "Main",
+      "eventName": "Record Store Day Australia 2025"
+    },
+    {
+      "sourceFile": "2025-germany-main.pdf",
+      "eventSlug": "rsd-2025-germany",
+      "year": 2025,
+      "country": "Germany",
+      "season": "Main",
+      "eventName": "Record Store Day Germany 2025"
+    },
+    {
+      "sourceFile": "2025-us-main.pdf",
+      "eventSlug": "rsd-2025-us",
+      "year": 2025,
+      "country": "US",
+      "season": "Main",
+      "eventName": "Record Store Day US 2025"
+    },
+    {
+      "sourceFile": "2024-canada-main.pdf",
+      "eventSlug": "rsd-2024-canada",
+      "year": 2024,
+      "country": "Canada",
+      "season": "Main",
+      "eventName": "Record Store Day Canada 2024"
+    },
+    {
+      "sourceFile": "2024-us-main.pdf",
+      "eventSlug": "rsd-2024-us",
+      "year": 2024,
+      "country": "US",
+      "season": "Main",
+      "eventName": "Record Store Day US 2024"
+    },
+    {
+      "sourceFile": "2024-uk-main.pdf",
+      "eventSlug": "rsd-2024-uk",
+      "year": 2024,
+      "country": "UK",
+      "season": "Main",
+      "eventName": "Record Store Day UK 2024"
+    },
+    {
+      "sourceFile": "2024-germany-main.pdf",
+      "eventSlug": "rsd-2024-germany",
+      "year": 2024,
+      "country": "Germany",
+      "season": "Main",
+      "eventName": "Record Store Day Germany 2024"
+    },
+    {
+      "sourceFile": "2023-italy-main.pdf",
+      "eventSlug": "rsd-2023-italy",
+      "year": 2023,
+      "country": "Italy",
+      "season": "Main",
+      "eventName": "Record Store Day Italy 2023"
+    },
+    {
+      "sourceFile": "2023-canada-main.pdf",
+      "eventSlug": "rsd-2023-canada",
+      "year": 2023,
+      "country": "Canada",
+      "season": "Main",
+      "eventName": "Record Store Day Canada 2023"
+    },
+    {
+      "sourceFile": "2023-germany-main.pdf",
+      "eventSlug": "rsd-2023-germany",
+      "year": 2023,
+      "country": "Germany",
+      "season": "Main",
+      "eventName": "Record Store Day Germany 2023"
+    },
+    {
+      "sourceFile": "2023-canada-black-friday.pdf",
+      "eventSlug": "rsd-black-friday-2023-canada",
+      "year": 2023,
+      "country": "Canada",
+      "season": "Black Friday",
+      "eventName": "Record Store Day Canada Black Friday 2023"
+    },
+    {
+      "sourceFile": "2023-us-black-friday.pdf",
+      "eventSlug": "rsd-black-friday-2023-us",
+      "year": 2023,
+      "country": "US",
+      "season": "Black Friday",
+      "eventName": "Record Store Day US Black Friday 2023"
+    },
+    {
+      "sourceFile": "2023-uk-main.pdf",
+      "eventSlug": "rsd-2023-uk",
+      "year": 2023,
+      "country": "UK",
+      "season": "Main",
+      "eventName": "Record Store Day UK 2023"
+    },
+    {
+      "sourceFile": "2022-us-main.pdf",
+      "eventSlug": "rsd-2022-us",
+      "year": 2022,
+      "country": "US",
+      "season": "Main",
+      "eventName": "Record Store Day US 2022"
+    },
+    {
+      "sourceFile": "2022-canada-main.pdf",
+      "eventSlug": "rsd-2022-canada",
+      "year": 2022,
+      "country": "Canada",
+      "season": "Main",
+      "eventName": "Record Store Day Canada 2022"
+    },
+    {
+      "sourceFile": "2022-australia-main.pdf",
+      "eventSlug": "rsd-2022-australia",
+      "year": 2022,
+      "country": "Australia",
+      "season": "Main",
+      "eventName": "Record Store Day Australia 2022"
+    },
+    {
+      "sourceFile": "2022-canada-black-friday.pdf",
+      "eventSlug": "rsd-black-friday-2022-canada",
+      "year": 2022,
+      "country": "Canada",
+      "season": "Black Friday",
+      "eventName": "Record Store Day Canada Black Friday 2022"
+    },
+    {
+      "sourceFile": "2021-us-main.pdf",
+      "eventSlug": "rsd-2021-us",
+      "year": 2021,
+      "country": "US",
+      "season": "Main",
+      "eventName": "Record Store Day US 2021"
+    },
+    {
+      "sourceFile": "2021-us-black-friday.pdf",
+      "eventSlug": "rsd-black-friday-2021-us",
+      "year": 2021,
+      "country": "US",
+      "season": "Black Friday",
+      "eventName": "Record Store Day US Black Friday 2021"
+    },
+    {
+      "sourceFile": "2021-canada-main.pdf",
+      "eventSlug": "rsd-2021-canada",
+      "year": 2021,
+      "country": "Canada",
+      "season": "Main",
+      "eventName": "Record Store Day Canada 2021"
+    },
+    {
+      "sourceFile": "2020-canada-main.pdf",
+      "eventSlug": "rsd-2020-canada",
+      "year": 2020,
+      "country": "Canada",
+      "season": "Main",
+      "eventName": "Record Store Day Canada 2020"
+    },
+    {
+      "sourceFile": "2020-us-main.pdf",
+      "eventSlug": "rsd-2020-us",
+      "year": 2020,
+      "country": "US",
+      "season": "Main",
+      "eventName": "Record Store Day US 2020"
+    }
+  ]
+}

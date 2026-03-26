@@ -15,7 +15,7 @@
                 <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="jns-8z-HZS">
                     <rect key="frame" x="0.0" y="0.0" width="364" height="231"/>
                     <subviews>
-                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zkT-nj-eQx" customClass="TVButton" customModule="RSD_Helper" customModuleProvider="target">
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zkT-nj-eQx">
                             <rect key="frame" x="112" y="20" width="140" height="140"/>
                             <subviews>
                                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="wfp-cM-Rmh">

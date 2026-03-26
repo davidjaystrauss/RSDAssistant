@@ -1,0 +1,15 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect id="background" x="0" y="0" width="1024" height="1024" rx="232" fill="#FBF8F6"/>
+
+  <circle id="record-body" cx="512" cy="380" r="228" fill="#16181D"/>
+  <circle id="groove-outer" cx="512" cy="380" r="180" stroke="#323640" stroke-width="8"/>
+  <circle id="groove-inner" cx="512" cy="380" r="140" stroke="#323640" stroke-width="6"/>
+  <circle id="label-outer" cx="512" cy="380" r="98" fill="#D7323F"/>
+  <circle id="label-inner" cx="512" cy="380" r="44" fill="#FBF8F6"/>
+  <circle id="spindle-hole" cx="512" cy="380" r="12" fill="#16181D"/>
+
+  <path id="bag-body" d="M272 482H752C789.555 482 820 512.445 820 550V812C820 849.555 789.555 880 752 880H272C234.445 880 204 849.555 204 812V550C204 512.445 234.445 482 272 482Z" fill="#D7323F"/>
+  <path id="bag-band" d="M272 482H752C789.555 482 820 512.445 820 550V600H204V550C204 512.445 234.445 482 272 482Z" fill="#E95963"/>
+  <path id="handle-outer" d="M362 490C362 411.599 425.599 348 504 348H520C598.401 348 662 411.599 662 490" stroke="#FBF8F6" stroke-width="18" stroke-linecap="round"/>
+  <path id="handle-inner" d="M400 490C400 432.588 446.588 386 504 386H520C577.412 386 624 432.588 624 490" stroke="#F4C7CC" stroke-width="10" stroke-linecap="round" opacity="0.95"/>
+</svg>

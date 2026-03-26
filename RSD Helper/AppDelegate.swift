@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import Firebase
+import SwiftUI
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,8 +16,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        FirebaseApp.configure()
+        NSUbiquitousKeyValueStore.default.synchronize()
+        let rootView = RSDRootView(appState: RSDAppState.shared)
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = UIHostingController(rootView: rootView)
+        window.makeKeyAndVisible()
+        self.window = window
         return true
     }
 
@@ -51,7 +55,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     enum Shortcut: String {
         case favorites = "Favorites"
-        case locator = "Find A Store"
     }
     
     func handleQuickAction(shortcutItem: UIApplicationShortcutItem) -> Bool {
@@ -61,24 +64,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let shortcutType = Shortcut.init(rawValue: type!) {
             switch shortcutType {
             case .favorites:
-                
-                let nextController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RSDFavoritesViewController") as? RSDFavoritesViewController
-                if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RSDViewController") as? RSDViewController {
-                    if let window = self.window, let rootViewController = window.rootViewController as? UINavigationController {
-                        rootViewController.pushViewController(nextController!, animated: true)
-                    }
-                }
-                
+                RSDAppState.shared.presentedSheet = .favorites
                 quickActionHandled = true
-            case .locator:
-                
-                let nextController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RSDStoreMapViewController") as? RSDStoreMapViewController
-                if let controller = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "RSDViewController") as? RSDViewController {
-                    if let window = self.window, let rootViewController = window.rootViewController as? UINavigationController {
-                        rootViewController.pushViewController(nextController!, animated: true)
-                    }
-                }
-                
             }
         }
         
@@ -86,4 +73,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
 }
-

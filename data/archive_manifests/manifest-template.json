@@ -1,0 +1,13 @@
+{
+  "items": [
+    {
+      "sourceFile": "2019-us-black-friday.pdf",
+      "eventSlug": "rsd-black-friday-2019-us",
+      "year": 2019,
+      "country": "US",
+      "season": "Black Friday",
+      "eventName": "Record Store Day US Black Friday 2019",
+      "notes": "Optional notes about source quality or parsing quirks"
+    }
+  ]
+}

@@ -10,7 +10,7 @@ import UIKit
 
 class RSDCollectionViewCell: UICollectionViewCell {
     
-    @IBOutlet weak var buttonAlbum: TVButton!
+    @IBOutlet weak var buttonAlbum: UIView!
     @IBOutlet weak var imageAlbum: UIImageView!
     @IBOutlet weak var imageFormatIcon: UIImageView!
     @IBOutlet weak var labelRecordSize: UILabel!
@@ -27,12 +27,6 @@ class RSDCollectionViewCell: UICollectionViewCell {
     }
     
     override func prepareForReuse() {
-        
-        let background = TVButtonLayer(image: UIImage(named: "filler")!)
-        buttonAlbum.layers = [background]
-        buttonAlbum.layoutSubviews()
-        buttonAlbum.parallaxIntensity = 1.0
-        buttonAlbum.shadowColor = .clear
         labelArtist.text = ""
         labelAlbum.text = ""
         imageAlbum.image = UIImage()

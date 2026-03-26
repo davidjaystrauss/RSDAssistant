@@ -1,0 +1,93 @@
+{
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:0.00000,0.47843,1.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "blend-mode-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            }
+          ],
+          "glass" : true,
+          "image-name" : "handle-inner.svg",
+          "name" : "handle-inner"
+        },
+        {
+          "blend-mode-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            }
+          ],
+          "image-name" : "handle-outer.svg",
+          "name" : "handle-outer"
+        },
+        {
+          "image-name" : "bag-band.svg",
+          "name" : "bag-band"
+        },
+        {
+          "image-name" : "bag-body.svg",
+          "name" : "bag-body"
+        },
+        {
+          "glass" : true,
+          "image-name" : "spindle-hole.svg",
+          "name" : "spindle-hole"
+        },
+        {
+          "image-name" : "groove-inner.svg",
+          "name" : "groove-inner"
+        },
+        {
+          "image-name" : "groove-outer.svg",
+          "name" : "groove-outer"
+        },
+        {
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "display-p3:0.96012,0.96611,0.90929,1.00000"
+              }
+            }
+          ],
+          "glass" : true,
+          "image-name" : "label-inner.svg",
+          "name" : "label-inner"
+        },
+        {
+          "image-name" : "label-outer.svg",
+          "name" : "label-outer"
+        },
+        {
+          "image-name" : "record-body.svg",
+          "name" : "record-body"
+        },
+        {
+          "image-name" : "background.svg",
+          "name" : "background"
+        }
+      ],
+      "name" : "canada",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

@@ -1,0 +1,369 @@
+{
+  "schemaVersion": 1,
+  "event": {
+    "slug": "rsd-2026-australia",
+    "name": "Record Store Day Australia 2026",
+    "kind": "regional",
+    "releaseDate": "2026-04-18"
+  },
+  "releases": [
+    {
+      "id": "sunset-rollercoaster-quit-quietly-cassette-exclusive-tw-au-jp-independent",
+      "artist": "落日飛車 Sunset Rollercoaster",
+      "title": "QUIT QUIETLY",
+      "format": "Cassette (exclusive TW/AU/JP)",
+      "label": "Independent",
+      "quantity": "",
+      "details": "Taiwanese indie band Sunset Rollercoaster are set to release their 2025 release album QUIT QUIETLY on tape for Record Store Day, exclusive to Australia, Taiwan and Japan.",
+      "imageURL": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/04/79/79047902-2c7e-1ca8-0a67-f968716e9d05/5021732943903.jpg/600x600bb.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/%e8%90%bd%e6%97%a5%e9%a3%9b%e8%bb%8a-sunset-rollercoaster-quit-quietly/",
+      "releaseType": "australian-release",
+      "appleMusic": {
+        "albumID": "1830256521",
+        "albumURL": "https://music.apple.com/au/album/quit-quietly/1830256521",
+        "artistName": "Sunset Rollercoaster",
+        "artistURL": null,
+        "artwork": {
+          "urlTemplate": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/79/04/79/79047902-2c7e-1ca8-0a67-f968716e9d05/5021732943903.jpg/{w}x{h}bb.jpg",
+          "width": 4000,
+          "height": 4000,
+          "bgColor": "d0894c",
+          "textColor1": "0c0401",
+          "textColor2": "0f0703",
+          "textColor3": "331f10",
+          "textColor4": "362111"
+        }
+      },
+      "spotify": null
+    },
+    {
+      "id": "egoism-trust-me-12-vinyl-impressed-recordings",
+      "artist": "Egoism",
+      "title": "(Trust Me)",
+      "format": "12” Vinyl",
+      "label": "Impressed Recordings",
+      "quantity": "",
+      "details": "Following the success of their Top 10 ARIA Australian Album “And Go Nowhere”, Sydney’s rising dream pop emo trio EGOISM announce their limited edition pressing of the reworked (Trust Me) tracks, six live-evolved reinterpretations from “And Go Nowhere”.  The vinyl release includes two exclusive tracks only available as part of this Record Store Day release, pressed on custom smoky colourway with an etched side.",
+      "imageURL": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/df/ac/93/dfac93e0-5eaa-fdcc-878a-8eb9ebf1bf72/TI170475_cover.png/600x600bb.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/egoism-trust-me/",
+      "releaseType": "australian-release",
+      "appleMusic": {
+        "albumID": "1845247043",
+        "albumURL": "https://music.apple.com/au/album/trust-me-ep/1845247043",
+        "artistName": "Egoism",
+        "artistURL": null,
+        "artwork": {
+          "urlTemplate": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/df/ac/93/dfac93e0-5eaa-fdcc-878a-8eb9ebf1bf72/TI170475_cover.png/{w}x{h}bb.jpg",
+          "width": 3000,
+          "height": 3000,
+          "bgColor": "898989",
+          "textColor1": "060606",
+          "textColor2": "060606",
+          "textColor3": "202020",
+          "textColor4": "202020"
+        }
+      },
+      "spotify": null
+    },
+    {
+      "id": "media-puzzle-new-racehorse-12-vinyl-180gm-solid-white-impressed-recordings",
+      "artist": "Media Puzzle",
+      "title": "New Racehorse",
+      "format": "12\" Vinyl 180gm, Solid White",
+      "label": "Impressed Recordings",
+      "quantity": "",
+      "details": "Australian egg punk meets pop sensibilities. Jittered guitars and lofi fuzzed out vocals. 2 minute songs that linger for a lifetime.  \r\nMedia Puzzle are fast becoming one of the most exciting musical exports.  Led by Tom Peters, Media Puzzle have released several EPs and LPs, with their latest EP Intermission received to much acclaim. Their upcoming LP, “New Racehorse”, to be released 18 April via Impressed Recordings.",
+      "imageURL": "https://recordstoreday.com.au/wp-content/uploads/2026/02/Media-Puzzle-1200x1200.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/media-puzzle-new-racehorse/",
+      "releaseType": "australian-release",
+      "appleMusic": null,
+      "spotify": null
+    },
+    {
+      "id": "das-druid-das-versions-12-vinyl-rhythm-section-international-and-beats-of-no-nation",
+      "artist": "Das Druid",
+      "title": "Das Versions",
+      "format": "12\" Vinyl",
+      "label": "Rhythm Section International & Beats Of No Nation",
+      "quantity": "",
+      "details": "A collaborative EP between UK based Rhythm Section International and Beats of No Nation, 'Das Versions' features new never heard before remixes from the bands last two releases.",
+      "imageURL": "https://recordstoreday.com.au/wp-content/uploads/2026/02/Das-Druid-artwork-1200x1200.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/das-druid-das-versions/",
+      "releaseType": "australian-release",
+      "appleMusic": null,
+      "spotify": null
+    },
+    {
+      "id": "king-gizzard-and-the-lizard-wizard-big-fig-wasp-bug-bee-shaped-vinyl-having-fun-records",
+      "artist": "King Gizzard & The Lizard Wizard",
+      "title": "Big Fig Wasp",
+      "format": "Bug/Bee Shaped Vinyl",
+      "label": "Having Fun Records",
+      "quantity": "",
+      "details": "King Gizzard & the Lizard Wizard official bootleg series, four tracks on one bug/bee shaped vinyl",
+      "imageURL": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/c4/b7/c2/c4b7c268-38db-d52a-f63f-953e6ea52826/9332727058639_cover.jpg/600x600bb.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/king-gizzard-the-lizard-wizard-big-fig-wasp/",
+      "releaseType": "australian-release",
+      "appleMusic": {
+        "albumID": "1658989230",
+        "albumURL": "https://music.apple.com/au/album/nonagon-infinity/1658989230",
+        "artistName": "King Gizzard & The Lizard Wizard",
+        "artistURL": null,
+        "artwork": {
+          "urlTemplate": "https://is1-ssl.mzstatic.com/image/thumb/Music122/v4/c4/b7/c2/c4b7c268-38db-d52a-f63f-953e6ea52826/9332727058639_cover.jpg/{w}x{h}bb.jpg",
+          "width": 1400,
+          "height": 1400,
+          "bgColor": "2d1906",
+          "textColor1": "d8c56a",
+          "textColor2": "e6a447",
+          "textColor3": "b6a256",
+          "textColor4": "c1883a"
+        }
+      },
+      "spotify": null
+    },
+    {
+      "id": "bluey-up-here-limited-zoetrope-picture-disc-vinyl-independent",
+      "artist": "Bluey",
+      "title": "Up Here",
+      "format": "Limited Zoetrope Picture Disc Vinyl",
+      "label": "Independent",
+      "quantity": "",
+      "details": "Queensland favourite turned global superstar Bluey returns for Record Store Day 2026",
+      "imageURL": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f5/9b/4a/f59b4ac6-47f1-4ea5-05a1-d0318aecb37f/cover.jpg/600x600bb.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/bluey-up-here/",
+      "releaseType": "australian-release",
+      "appleMusic": {
+        "albumID": "1867853033",
+        "albumURL": "https://music.apple.com/au/album/up-here-the-orchestral-album/1867853033",
+        "artistName": "Bluey",
+        "artistURL": null,
+        "artwork": {
+          "urlTemplate": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/f5/9b/4a/f59b4ac6-47f1-4ea5-05a1-d0318aecb37f/cover.jpg/{w}x{h}bb.jpg",
+          "width": 3000,
+          "height": 3000,
+          "bgColor": "10102a",
+          "textColor1": "ccd1ea",
+          "textColor2": "369be4",
+          "textColor3": "a6aac3",
+          "textColor4": "2f7fbf"
+        }
+      },
+      "spotify": null
+    },
+    {
+      "id": "empire-of-the-sun-walking-on-a-dream-2lp-emi-music-australia",
+      "artist": "Empire Of The Sun",
+      "title": "Walking On A Dream",
+      "format": "2LP",
+      "label": "EMI Music Australia",
+      "quantity": "",
+      "details": "Originally released in 2008, Walking On A Dream was the record that built the Empire Of The Sun universe and propelled the duo onto the global stage.",
+      "imageURL": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7f/63/2c/7f632c08-3960-de3d-d34c-ee8140038b69/13UADIM60773.rgb.jpg/600x600bb.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/empire-of-the-sun-walking-on-a-dream/",
+      "releaseType": "australian-release",
+      "appleMusic": {
+        "albumID": "712862605",
+        "albumURL": "https://music.apple.com/au/album/walking-on-a-dream-special-edition/712862605",
+        "artistName": "Empire Of The Sun",
+        "artistURL": null,
+        "artwork": {
+          "urlTemplate": "https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/7f/63/2c/7f632c08-3960-de3d-d34c-ee8140038b69/13UADIM60773.rgb.jpg/{w}x{h}bb.jpg",
+          "width": 1400,
+          "height": 1400,
+          "bgColor": "0a1119",
+          "textColor1": "e0d3ca",
+          "textColor2": "becbed",
+          "textColor3": "b5aca7",
+          "textColor4": "9aa6c3"
+        }
+      },
+      "spotify": null
+    },
+    {
+      "id": "crooked-colours-vera-1lp-12-purple-splash-vinyl-sweat-it-out",
+      "artist": "Crooked Colours",
+      "title": "Vera",
+      "format": "1LP (12Ó Purple Splash Vinyl)",
+      "label": "Sweat It Out",
+      "quantity": "",
+      "details": "Rediscover the vibrant energy of Crooked Colours' debut album, ‘Vera’, as they release a limited edition ‘Purple Splash’ vinyl pressing.",
+      "imageURL": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/2d/51/23/2d5123d6-4615-08c6-e13f-a379e0a7fc74/190295808600.jpg/600x600bb.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/crooked-colours-vera/",
+      "releaseType": "australian-release",
+      "appleMusic": {
+        "albumID": "1225667954",
+        "albumURL": "https://music.apple.com/au/album/vera/1225667954",
+        "artistName": "Crooked Colours",
+        "artistURL": null,
+        "artwork": {
+          "urlTemplate": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/2d/51/23/2d5123d6-4615-08c6-e13f-a379e0a7fc74/190295808600.jpg/{w}x{h}bb.jpg",
+          "width": 1425,
+          "height": 1425,
+          "bgColor": "20234f",
+          "textColor1": "bdbff5",
+          "textColor2": "5198f7",
+          "textColor3": "9da0d3",
+          "textColor4": "4780d6"
+        }
+      },
+      "spotify": null
+    },
+    {
+      "id": "holy-holy-sweet-bitter-sweet-1lp-red-blue-marble-sony",
+      "artist": "Holy Holy",
+      "title": "Sweet Bitter Sweet",
+      "format": "1LP (Red/Blue Marble)",
+      "label": "SONY",
+      "quantity": "",
+      "details": "Follwing the 2025 announcement of their indefinite hiatus, this year Holy Holy are sharing a vinyl debut of Sweet Bitter Sweet exclusively for RSD",
+      "imageURL": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4f/40/64/4f40649e-671a-37f1-af92-9b42161b4dc6/196873030296.jpg/600x600bb.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/holy-holy-sweet-bitter-sweet/",
+      "releaseType": "australian-release",
+      "appleMusic": {
+        "albumID": "1805976196",
+        "albumURL": "https://music.apple.com/au/album/sweet-bitter-sweet/1805976196",
+        "artistName": "Holy Holy",
+        "artistURL": null,
+        "artwork": {
+          "urlTemplate": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4f/40/64/4f40649e-671a-37f1-af92-9b42161b4dc6/196873030296.jpg/{w}x{h}bb.jpg",
+          "width": 3000,
+          "height": 3000,
+          "bgColor": "bc977a",
+          "textColor1": "070706",
+          "textColor2": "080807",
+          "textColor3": "2b241d",
+          "textColor4": "2c241e"
+        }
+      },
+      "spotify": null
+    },
+    {
+      "id": "jupita-io-deluxe-1lp-earth",
+      "artist": "JUPiTA",
+      "title": "iO. DELUXE",
+      "format": "1LP",
+      "label": "earth²",
+      "quantity": "",
+      "details": "iO., is an expansive sonic realm designed to transport listeners into a space where sound becomes a form of healing, released for Record Store Day with an exclusive slip mat",
+      "imageURL": "https://recordstoreday.com.au/wp-content/uploads/2026/02/FRONT-COVER.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/jupita-io-deluxe/",
+      "releaseType": "australian-release",
+      "appleMusic": null,
+      "spotify": null
+    },
+    {
+      "id": "kutcha-edwards-with-the-melbourne-youth-orchestra-warta-kiki-1-lp-independent",
+      "artist": "Kutcha Edwards with the Melbourne Youth Orchestra",
+      "title": "Warta-Kiki",
+      "format": "1 LP",
+      "label": "Independent",
+      "quantity": "",
+      "details": "A landmark collaboration between legendary songman Kutcha Edwards and the Melbourne Youth\r\nOrchestra",
+      "imageURL": "https://recordstoreday.com.au/wp-content/uploads/2026/02/MR-Kutcha-Edwards-MYO-Warta-Kiki-2.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/kutcha-edwards-with-the-melbourne-youth-orchestra-warta-kiki/",
+      "releaseType": "australian-release",
+      "appleMusic": null,
+      "spotify": null
+    },
+    {
+      "id": "ruel-what-it-sounds-like-1lp-recess-records",
+      "artist": "Ruel",
+      "title": "What It Sounds Like",
+      "format": "1LP",
+      "label": "Recess Records",
+      "quantity": "",
+      "details": "12” of singles, unreleased demos, and stripped-down recordings for Ruel's Record Store Day 2026 release 'What It Sounds Like'",
+      "imageURL": "https://recordstoreday.com.au/wp-content/uploads/2026/02/Ruel-RSD-Cover-1200x1200.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/ruel-what-it-sounds-like/",
+      "releaseType": "australian-release",
+      "appleMusic": null,
+      "spotify": null
+    },
+    {
+      "id": "spacey-jane-live-at-the-hordern-pavilion-sydney-nsw-2025-1lp-independent",
+      "artist": "Spacey Jane",
+      "title": "Live At The Hordern Pavilion, Sydney NSW, 2025",
+      "format": "1LP",
+      "label": "Independent",
+      "quantity": "",
+      "details": "Live At The Hordern Pavilion, Sydney NSW, 2025, Limited Coke Bottle Green Coloured Vinyl",
+      "imageURL": "https://recordstoreday.com.au/wp-content/uploads/2026/02/Spacey-Jane.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/spacey-jane-live-at-the-hordern-pavilion-sydney-nsw-2025/",
+      "releaseType": "australian-release",
+      "appleMusic": null,
+      "spotify": null
+    },
+    {
+      "id": "starley-call-on-me-1lp-central-station-records",
+      "artist": "Starley",
+      "title": "Call On Me",
+      "format": "1LP",
+      "label": "Central Station Records",
+      "quantity": "",
+      "details": "Marking the 10th anniversary of the iconic ‘Call On Me’ in 2026, Starley is celebrating the milestone by releasing an exclusive, highly anticipated vinyl pressing for her global fanbase",
+      "imageURL": "https://is1-ssl.mzstatic.com/image/thumb/Music60/v4/17/8e/b6/178eb67e-c787-6a20-57d3-1e243ecb250c/TINT0041.jpg/600x600bb.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/starley-call-on-me/",
+      "releaseType": "australian-release",
+      "appleMusic": {
+        "albumID": "1134770093",
+        "albumURL": "https://music.apple.com/au/album/call-on-me-single/1134770093",
+        "artistName": "Starley",
+        "artistURL": null,
+        "artwork": {
+          "urlTemplate": "https://is1-ssl.mzstatic.com/image/thumb/Music60/v4/17/8e/b6/178eb67e-c787-6a20-57d3-1e243ecb250c/TINT0041.jpg/{w}x{h}bb.jpg",
+          "width": 3000,
+          "height": 3000,
+          "bgColor": "f5f5f5",
+          "textColor1": "1d181a",
+          "textColor2": "362e2e",
+          "textColor3": "484446",
+          "textColor4": "5c5656"
+        }
+      },
+      "spotify": null
+    },
+    {
+      "id": "various-artists-live-at-hiss-and-crackle-volume-1-1lp-hiss-and-crackle",
+      "artist": "Various Artists",
+      "title": "Live At Hiss & Crackle - Volume 1",
+      "format": "1LP",
+      "label": "Hiss & Crackle",
+      "quantity": "",
+      "details": "A collection of live performance recordings from the Hiss & Crackle stage. Capturing the burgeoning Newcastle music scene in its raw and exciting live form",
+      "imageURL": "https://recordstoreday.com.au/wp-content/uploads/2026/02/FRONT-COVER-2-1200x1200.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/various-artists-live-at-hiss-crackle-volume-1/",
+      "releaseType": "australian-release",
+      "appleMusic": null,
+      "spotify": null
+    },
+    {
+      "id": "saint-ergo-lived-experience-vinyl-independent",
+      "artist": "Saint Ergo",
+      "title": "Lived Experience",
+      "format": "Vinyl",
+      "label": "Independent",
+      "quantity": "",
+      "details": "Saint Ergo’s debut album ‘Lived Experience’ promises depth, courage and uncompromising queer beauty.",
+      "imageURL": "https://recordstoreday.com.au/wp-content/uploads/2026/02/The-Broken-Single-Square-Banner-No-Text-1200x1200.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/saint-ergo-lived-experience/",
+      "releaseType": "australian-release",
+      "appleMusic": null,
+      "spotify": null
+    },
+    {
+      "id": "keeahn-for-me-for-you-x-vinyl-northside-records",
+      "artist": "Kee’ahn",
+      "title": "for me, for you x",
+      "format": "Vinyl",
+      "label": "Northside Records",
+      "quantity": "",
+      "details": "Debut release from Kee’ahn (she/they/nyulu) who is a Kuku Yalanji, Jirrbal, Torres Strait Islander songwriter and performer.\r\nLP RSD edition (50 copies only)!",
+      "imageURL": "https://recordstoreday.com.au/wp-content/uploads/2026/02/Keeahn-art.jpg",
+      "sourceURL": "https://recordstoreday.com.au/releases/keeahn-for-me-for-you-x/",
+      "releaseType": "australian-release",
+      "appleMusic": null,
+      "spotify": null
+    }
+  ]
+}

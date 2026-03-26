@@ -1,10 +1,4 @@
 
-[submodule "MPParallaxView"]
-	path = MPParallaxView
-	url = https://github.com/DroidsOnRoids/MPParallaxView.git
-[submodule "TVButton"]
-	path = TVButton
-	url = https://github.com/marmelroy/TVButton.git
 [submodule "SDWebImage"]
 	path = SDWebImage
 	url = https://github.com/rs/SDWebImage.git

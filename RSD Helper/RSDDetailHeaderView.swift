@@ -13,6 +13,6 @@ class RSDDetailHeaderView: UITableViewHeaderFooterView {
     @IBOutlet weak var imageAlbum: UIImageView!
     @IBOutlet weak var labelAlbum: UILabel!
     @IBOutlet weak var labelFormat: UILabel!
-    @IBOutlet weak var tvButton: TVButton!
+    @IBOutlet weak var tvButton: UIView!
     
    }

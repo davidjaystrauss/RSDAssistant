@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "event": {
+    "slug": "rsd-2026",
+    "name": "Record Store Day 2026",
+      "kind": "main",
+      "releaseDate": "2026-04-18"
+  },
+  "releases": []
+}
