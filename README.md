@@ -15,9 +15,13 @@ The project now includes:
 The app currently supports:
 
 - release browsing in `list`, `grid`, and `cover flow`
+- grid as the default first-run releases layout
+- locale-aware default selection of the active `2026` regional list, falling back to Canada
 - search, sort, reverse sort, and filter controls
 - favorites saved per active list
+- home screen quick actions for `Favorites` and `Participating Stores`
 - Apple Music plus secondary preview links from the detail screen
+- prioritized artwork loading when a detail screen is opened before cover art has loaded
 - a full-screen stores map with floating list, search, and favorite-store selection
 - iCloud key-value sync for favorites and selected store
 - PDF export of favorites with artwork and event/store header
@@ -180,6 +184,7 @@ Branding and icon exploration lives in:
 
 - [`docs/branding-system.md`](/Users/davidstrauss/Documents/RSD%20Helper/docs/branding-system.md)
 - [`docs/RSDIcon.icon`](/Users/davidstrauss/Documents/RSD%20Helper/docs/RSDIcon.icon)
+- [`docs/RSD-record-only.svg`](/Users/davidstrauss/Documents/RSD%20Helper/docs/RSD-record-only.svg)
 - [`docs/icon-example-record-bag-us.svg`](/Users/davidstrauss/Documents/RSD%20Helper/docs/icon-example-record-bag-us.svg)
 - [`docs/icon-example-record-bag-canada.svg`](/Users/davidstrauss/Documents/RSD%20Helper/docs/icon-example-record-bag-canada.svg)
 - [`docs/icon-example-record-bag-black-friday.svg`](/Users/davidstrauss/Documents/RSD%20Helper/docs/icon-example-record-bag-black-friday.svg)
@@ -195,7 +200,7 @@ Branding and icon exploration lives in:
 ## Next Logical Work
 
 - continue improving the weaker archive families only where it materially improves match quality
-- finalize the app icon / brand assets
+- finalize the remaining launch/static brand asset pipeline and remove stale legacy asset copies
 - continue expanding international store coverage
 - adopt Tahoe / iOS 26 visual APIs after the current baseline is committed
 

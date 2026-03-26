@@ -30,107 +30,41 @@ struct FavoritesView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                LinearGradient(
-                    colors: [theme.backgroundTop, theme.backgroundBottom],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+        GeometryReader { geometry in
+            let isLandscape = geometry.size.width > geometry.size.height
+            let isImmersiveCoverFlow = appState.favoritesViewMode == .coverFlow && geometry.size.width > geometry.size.height
 
-                Group {
-                    if filteredFavorites.isEmpty {
-                        VStack(spacing: 12) {
-                            Text("No Favorites Yet")
-                                .font(.title3)
-                            Text("Save releases from \(list.displayName) and they’ll show up here.")
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal)
-                        }
-                    } else {
-                        switch appState.favoritesViewMode {
-                        case .list:
-                            List(filteredFavorites) { listing in
-                                NavigationLink(destination: ReleaseDetailView(listing: listing, list: list)) {
-                                    ReleaseRowView(
-                                        listing: listing,
-                                        isFavorite: true,
-                                        onFavoriteToggle: {
-                                            favoritesStore.toggle(listing, in: list)
-                                        }
-                                    )
-                                }
-                            }
-                            .listStyle(PlainListStyle())
-                            .scrollContentBackground(.hidden)
-
-                        case .grid:
-                            ScrollView {
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 16)], spacing: 18) {
-                                    ForEach(filteredFavorites) { listing in
-                                        NavigationLink(destination: ReleaseDetailView(listing: listing, list: list)) {
-                                            ReleaseGridCardView(
-                                                listing: listing,
-                                                isFavorite: true,
-                                                onFavoriteToggle: {
-                                                    favoritesStore.toggle(listing, in: list)
-                                                }
-                                            )
-                                        }
-                                        .buttonStyle(.plain)
-                                    }
-                                }
-                                .padding()
-                            }
-
-                        case .coverFlow:
-                            GeometryReader { outerGeometry in
-                                let cardWidth: CGFloat = 240
-                                let overlapSpacing: CGFloat = -32
-
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    LazyHStack(spacing: overlapSpacing) {
-                                        ForEach(filteredFavorites) { listing in
-                                            GeometryReader { itemGeometry in
-                                                let frame = itemGeometry.frame(in: .global)
-                                                let containerMidX = outerGeometry.frame(in: .global).midX
-                                                let distance = frame.midX - containerMidX
-                                                let normalizedDistance = max(-1, min(1, distance / 260))
-
-                                                CoverFlowCardView(
-                                                    listing: listing,
-                                                    isFavorite: true,
-                                                    onTap: {
-                                                        selectedCoverFlowListing = listing
-                                                    },
-                                                    onFavoriteToggle: {
-                                                        favoritesStore.toggle(listing, in: list)
-                                                    },
-                                                    normalizedDistanceFromCenter: normalizedDistance
-                                                )
-                                            }
-                                            .frame(width: cardWidth, height: 360)
-                                        }
-                                    }
-                                    .padding(.horizontal, max((outerGeometry.size.width - cardWidth) / 2, 24))
-                                    .padding(.vertical, 30)
-                                    .frame(minHeight: 420)
-                                }
-                            }
-                        }
+            Group {
+                if isImmersiveCoverFlow {
+                    NavigationStack {
+                        favoritesContent(isImmersiveCoverFlow: true, isLandscape: isLandscape)
+                            .navigationTitle("Favorites")
+                            .navigationBarTitleDisplayMode(.large)
+                            .toolbar(.hidden, for: .navigationBar)
+                            .tint(theme.tint)
+                            .accentColor(theme.tint)
+                    }
+                } else {
+                    NavigationStack {
+                        favoritesContent(isImmersiveCoverFlow: false, isLandscape: isLandscape)
+                            .navigationTitle("Favorites")
+                            .navigationBarTitleDisplayMode(.large)
+                            .modifier(FavoritesSearchModifier(isEnabled: true, text: $searchText))
+                            .background(
+                                FavoritesNavigationBarConfigurator(
+                                    backgroundColor: UIColor(theme.navigationBar),
+                                    titleColor: colorScheme == .dark ? .white : .label,
+                                    tintColor: UIColor(theme.tint)
+                                )
+                            )
+                            .toolbarBackground(AnyShapeStyle(theme.navigationBar), for: .navigationBar)
+                            .toolbarBackground(.visible, for: .navigationBar)
+                            .tint(theme.tint)
+                            .accentColor(theme.tint)
+                            .toolbar(content: toolbarContent)
                     }
                 }
             }
-            .navigationTitle("Favorites")
-            .navigationBarTitleDisplayMode(.large)
-            .searchable(text: $searchText, prompt: "Search favorites")
-            .toolbarBackground(AnyShapeStyle(theme.navigationBar.opacity(colorScheme == .dark ? 0.92 : 0.98)), for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .tint(theme.tint)
-            .accentColor(theme.tint)
-            .toolbar(content: toolbarContent)
         }
         .sheet(item: $shareDocument) { document in
             ActivityShareSheet(activityItems: [document.url])
@@ -141,6 +75,107 @@ struct FavoritesView: View {
             }
             .tint(theme.tint)
             .accentColor(theme.tint)
+        }
+#if targetEnvironment(macCatalyst)
+        .frame(minWidth: 760, idealWidth: 980, maxWidth: .infinity, minHeight: 620, idealHeight: 760, maxHeight: .infinity)
+#endif
+    }
+
+    private func favoritesContent(isImmersiveCoverFlow: Bool, isLandscape: Bool) -> some View {
+        ZStack {
+            LinearGradient(
+                colors: [theme.backgroundTop, theme.backgroundBottom],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            Group {
+                if filteredFavorites.isEmpty {
+                    VStack(spacing: 12) {
+                        Text("No Favorites Yet")
+                            .font(.title3)
+                        Text("Save releases from \(list.displayName) and they’ll show up here.")
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                } else {
+                    switch appState.favoritesViewMode {
+                    case .list:
+                        List(filteredFavorites) { listing in
+                            favoriteRowNavigation(for: listing)
+                                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                                .listRowBackground(SwiftUI.Color.clear)
+                        }
+                        .listStyle(PlainListStyle())
+                        .scrollContentBackground(.hidden)
+
+                    case .grid:
+                        let columnSpacing = isLandscape ? 22.0 : 16.0
+                        let rowSpacing = isLandscape ? 24.0 : 18.0
+                        let contentPadding = isLandscape ? 12.0 : 16.0
+                        ScrollView {
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: columnSpacing)], spacing: rowSpacing) {
+                                ForEach(filteredFavorites) { listing in
+                                    favoriteGridNavigation(for: listing)
+                                        .buttonStyle(.plain)
+                                }
+                            }
+                            .padding(contentPadding)
+                        }
+
+                    case .coverFlow:
+                        GeometryReader { outerGeometry in
+                            let availableWidth = outerGeometry.size.width
+                            let containerHeight = outerGeometry.size.height
+                            let cardWidth = isImmersiveCoverFlow
+                                ? min(max(min(availableWidth * 0.42, containerHeight * 0.52), 220), 320)
+                                : min(max(availableWidth * 0.62, 240), 420)
+                            let overlapSpacing = -cardWidth * 0.14
+                            let itemHeight = isImmersiveCoverFlow
+                                ? min(max(cardWidth + 118, 330), max(containerHeight - 32, 280))
+                                : max(cardWidth + 120, 360)
+                            let contentHeight = isImmersiveCoverFlow
+                                ? outerGeometry.size.height
+                                : max(cardWidth + 180, 420)
+
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                LazyHStack(spacing: overlapSpacing) {
+                                    ForEach(filteredFavorites) { listing in
+                                        GeometryReader { itemGeometry in
+                                            let frame = itemGeometry.frame(in: .global)
+                                            let containerMidX = outerGeometry.frame(in: .global).midX
+                                            let distance = frame.midX - containerMidX
+                                            let normalizedDistance = max(-1, min(1, distance / 260))
+
+                                            CoverFlowCardView(
+                                                listing: listing,
+                                                isFavorite: true,
+                                                themeTint: theme.tint,
+                                                cardWidth: cardWidth,
+                                                showsMetadata: true,
+                                                prefersCompactArtwork: isImmersiveCoverFlow,
+                                                onTap: {
+                                                    selectedCoverFlowListing = listing
+                                                },
+                                                onFavoriteToggle: {
+                                                    favoritesStore.toggle(listing, in: list)
+                                                },
+                                                normalizedDistanceFromCenter: normalizedDistance
+                                            )
+                                        }
+                                        .frame(width: cardWidth, height: itemHeight)
+                                    }
+                                }
+                                .padding(.horizontal, max((outerGeometry.size.width - cardWidth) / 2, 24))
+                                .padding(.vertical, 30)
+                                .frame(minHeight: contentHeight)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -154,6 +189,32 @@ struct FavoritesView: View {
             return favoriteListings
         }
         return favoriteListings.filter { $0.searchableText.contains(query) }
+    }
+
+    private func favoriteRowNavigation(for listing: Listing) -> some View {
+        NavigationLink(destination: ReleaseDetailView(listing: listing, list: list)) {
+            ReleaseRowView(
+                listing: listing,
+                isFavorite: true,
+                themeTint: theme.tint,
+                onFavoriteToggle: {
+                    favoritesStore.toggle(listing, in: list)
+                }
+            )
+        }
+    }
+
+    private func favoriteGridNavigation(for listing: Listing) -> some View {
+        NavigationLink(destination: ReleaseDetailView(listing: listing, list: list)) {
+            ReleaseGridCardView(
+                listing: listing,
+                isFavorite: true,
+                themeTint: theme.tint,
+                onFavoriteToggle: {
+                    favoritesStore.toggle(listing, in: list)
+                }
+            )
+        }
     }
 
     @ToolbarContentBuilder
@@ -226,6 +287,50 @@ struct ActivityShareSheet: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
+private struct FavoritesNavigationBarConfigurator: UIViewControllerRepresentable {
+    let backgroundColor: UIColor
+    let titleColor: UIColor
+    let tintColor: UIColor
+
+    func makeUIViewController(context: Context) -> UIViewController {
+        UIViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+        guard let navigationController = uiViewController.navigationController else { return }
+        let navigationBar = navigationController.navigationBar
+
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = backgroundColor
+        appearance.titleTextAttributes = [.foregroundColor: titleColor]
+        appearance.largeTitleTextAttributes = [.foregroundColor: titleColor]
+
+        navigationController.navigationBar.prefersLargeTitles = true
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.compactAppearance = appearance
+        navigationBar.compactScrollEdgeAppearance = appearance
+        navigationBar.isTranslucent = false
+        navigationBar.tintColor = tintColor
+        navigationController.view.tintColor = tintColor
+        uiViewController.view.tintColor = tintColor
+    }
+}
+
+private struct FavoritesSearchModifier: ViewModifier {
+    let isEnabled: Bool
+    @Binding var text: String
+
+    func body(content: Content) -> some View {
+        if isEnabled {
+            content.searchable(text: $text, prompt: "Search favorites")
+        } else {
+            content
+        }
+    }
+}
+
 enum FavoriteExportBuilder {
     static func makePDF(for listings: [Listing], list: RSDListDefinition, selectedStore: ParticipatingStoreRecord?) async -> URL {
         let artworkImages = await loadArtworkImages(for: listings)
@@ -244,12 +349,13 @@ enum FavoriteExportBuilder {
             let bannerHeight: CGFloat = 88
             let tableHeaderHeight: CGFloat = 28
             let minimumRowHeight: CGFloat = 78
-            let artworkSize = CGSize(width: 46, height: 46)
+            let artworkSize = CGSize(width: 60, height: 60)
             let printBlack = UIColor(red: 0.08, green: 0.08, blue: 0.08, alpha: 1)
             let printGray = UIColor(red: 0.42, green: 0.42, blue: 0.44, alpha: 1)
             let printLightGray = UIColor(red: 0.95, green: 0.95, blue: 0.96, alpha: 1)
             let printWhite = UIColor.white
             let notesSectionHeight: CGFloat = 132
+            let notesSectionTopPadding: CGFloat = 4
             let columnSpecs = tableColumns(
                 totalWidth: contentRect.width,
                 includeCategory: includeCategory,
@@ -295,12 +401,14 @@ enum FavoriteExportBuilder {
                 theme.accent.setFill()
                 UIBezierPath(roundedRect: accentRect, byRoundingCorners: [.bottomLeft, .bottomRight], cornerRadii: CGSize(width: 18, height: 18)).fill()
 
-                let titleRect = CGRect(x: bannerRect.minX + 20, y: bannerRect.minY + 14, width: bannerRect.width * 0.62, height: 34)
-                let subtitleRect = CGRect(x: bannerRect.minX + 20, y: bannerRect.minY + 46, width: bannerRect.width * 0.62, height: 18)
-                let metadataRect = CGRect(x: bannerRect.midX + 20, y: bannerRect.minY + 18, width: bannerRect.width * 0.32, height: 44)
+                let titleRect = CGRect(x: bannerRect.minX + 20, y: bannerRect.minY + 12, width: bannerRect.width * 0.62, height: 32)
+                let subtitleRect = CGRect(x: bannerRect.minX + 20, y: bannerRect.minY + 44, width: bannerRect.width * 0.62, height: 16)
+                let countRect = CGRect(x: bannerRect.minX + 20, y: bannerRect.minY + 60, width: bannerRect.width * 0.62, height: 16)
+                let metadataRect = CGRect(x: bannerRect.midX + 12, y: bannerRect.minY + 14, width: bannerRect.width * 0.36, height: 58)
 
                 "Record Store Day Favorites".draw(in: titleRect, withAttributes: headerTitleAttributes)
                 list.displayName.draw(in: subtitleRect, withAttributes: headerSubtitleAttributes)
+                "\(listings.count) favorites".draw(in: countRect, withAttributes: headerSubtitleAttributes)
 
                 let metadataParagraph = NSMutableParagraphStyle()
                 metadataParagraph.alignment = .right
@@ -309,8 +417,16 @@ enum FavoriteExportBuilder {
                     .foregroundColor: printWhite.withAlphaComponent(0.92),
                     .paragraphStyle: metadataParagraph,
                 ]
-                let storeLine = selectedStore.map { "Store: \($0.displayName)" } ?? "Store: ____________________"
-                let metadata = "\(listings.count) favorites • Generated \(DateFormatter.favoriteExport.string(from: Date()))\n\(storeLine)"
+                let storeLine = selectedStore?.displayName ?? "____________________"
+                let addressLine = selectedStore.map { store in
+                    [store.address, [store.city, abbreviatedRegion(store.state, country: store.country)].filter { !$0.isEmpty }.joined(separator: ", ")]
+                        .filter { $0.isEmpty == false }
+                        .joined(separator: ", ")
+                } ?? "____________________"
+                let phoneLine = selectedStore.map { store in
+                    store.phone.isEmpty ? "____________________" : store.phone
+                } ?? "____________________"
+                let metadata = "\(storeLine)\n\(addressLine)\n\(phoneLine)"
                 metadata.draw(in: metadataRect, withAttributes: metadataAttributes)
 
                 let headerY = bannerRect.maxY + 14
@@ -359,7 +475,7 @@ enum FavoriteExportBuilder {
 
                 while rowIndex < listings.count {
                     let listing = listings[rowIndex]
-                    let artworkImage = artworkImages[listing.id] ?? UIImage(named: "filler")
+                    let artworkImage = artworkImages[listing.id] ?? RSDPlaceholderArt.image(size: 220, userInterfaceStyle: .light)
                     let measuredRowHeight = rowHeight(
                         for: listing,
                         columns: columnSpecs,
@@ -450,7 +566,13 @@ enum FavoriteExportBuilder {
                 }
 
                 if rowIndex >= listings.count {
-                    drawGlobalNotesSection(startY: yPosition + 4)
+                    if yPosition + notesSectionTopPadding + notesSectionHeight <= contentRect.maxY {
+                        drawGlobalNotesSection(startY: yPosition + notesSectionTopPadding)
+                    } else {
+                        context.beginPage()
+                        let headerBottom = drawPageHeader()
+                        drawGlobalNotesSection(startY: headerBottom + notesSectionTopPadding)
+                    }
                     break
                 }
             }
@@ -480,7 +602,7 @@ enum FavoriteExportBuilder {
 
     private static func artworkImage(for listing: Listing) async -> UIImage? {
         guard let url = URL(string: listing.photoURL), listing.photoURL.isEmpty == false else {
-            return UIImage(named: "filler")
+            return RSDPlaceholderArt.image(size: 220, userInterfaceStyle: .light)
         }
 
         if let cached = ArtworkPipeline.shared.cachedImage(for: url) {
@@ -503,8 +625,17 @@ enum FavoriteExportBuilder {
             return
         }
 
-        let fittedRect = AVMakeRect(aspectRatio: image.size, insideRect: rect.insetBy(dx: 2, dy: 2))
-        image.draw(in: fittedRect)
+        let drawRect: CGRect
+        let imageAspect = image.size.width / max(image.size.height, 1)
+        let rectAspect = rect.width / max(rect.height, 1)
+        if imageAspect > rectAspect {
+            let scaledWidth = rect.height * imageAspect
+            drawRect = CGRect(x: rect.midX - scaledWidth / 2, y: rect.minY, width: scaledWidth, height: rect.height)
+        } else {
+            let scaledHeight = rect.width / max(imageAspect, 0.0001)
+            drawRect = CGRect(x: rect.minX, y: rect.midY - scaledHeight / 2, width: rect.width, height: scaledHeight)
+        }
+        image.draw(in: drawRect)
         context.restoreGState()
     }
 
@@ -614,6 +745,92 @@ enum FavoriteExportBuilder {
             .components(separatedBy: CharacterSet.alphanumerics.inverted)
             .filter { !$0.isEmpty }
             .joined(separator: "-")
+    }
+
+    private static func abbreviatedRegion(_ value: String, country: String) -> String {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.isEmpty == false else { return "" }
+        if trimmed.count <= 3 {
+            return trimmed.uppercased()
+        }
+
+        let normalizedCountry = country.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+
+        let abbreviations: [String: String] = [
+            "Alberta": "AB",
+            "British Columbia": "BC",
+            "Manitoba": "MB",
+            "New Brunswick": "NB",
+            "Newfoundland and Labrador": "NL",
+            "Nova Scotia": "NS",
+            "Ontario": "ON",
+            "Prince Edward Island": "PE",
+            "Québec": "QC",
+            "Quebec": "QC",
+            "Saskatchewan": "SK",
+            "Yukon": "YT",
+            "Northwest Territories": "NT",
+            "Nunavut": "NU",
+            "Alabama": "AL",
+            "Alaska": "AK",
+            "Arizona": "AZ",
+            "Arkansas": "AR",
+            "California": "CA",
+            "Colorado": "CO",
+            "Connecticut": "CT",
+            "Delaware": "DE",
+            "Florida": "FL",
+            "Georgia": "GA",
+            "Hawaii": "HI",
+            "Idaho": "ID",
+            "Illinois": "IL",
+            "Indiana": "IN",
+            "Iowa": "IA",
+            "Kansas": "KS",
+            "Kentucky": "KY",
+            "Louisiana": "LA",
+            "Maine": "ME",
+            "Maryland": "MD",
+            "Massachusetts": "MA",
+            "Michigan": "MI",
+            "Minnesota": "MN",
+            "Mississippi": "MS",
+            "Missouri": "MO",
+            "Montana": "MT",
+            "Nebraska": "NE",
+            "Nevada": "NV",
+            "New Hampshire": "NH",
+            "New Jersey": "NJ",
+            "New Mexico": "NM",
+            "New York": "NY",
+            "North Carolina": "NC",
+            "North Dakota": "ND",
+            "Ohio": "OH",
+            "Oklahoma": "OK",
+            "Oregon": "OR",
+            "Pennsylvania": "PA",
+            "Rhode Island": "RI",
+            "South Carolina": "SC",
+            "South Dakota": "SD",
+            "Tennessee": "TN",
+            "Texas": "TX",
+            "Utah": "UT",
+            "Vermont": "VT",
+            "Virginia": "VA",
+            "Washington": "WA",
+            "West Virginia": "WV",
+            "Wisconsin": "WI",
+            "Wyoming": "WY",
+        ]
+
+        guard normalizedCountry.contains("united states")
+            || normalizedCountry == "us"
+            || normalizedCountry.contains("canada")
+            || normalizedCountry == "ca" else {
+            return trimmed
+        }
+
+        return abbreviations[trimmed] ?? trimmed
     }
 
     private static func theme(for list: RSDListDefinition) -> PDFTheme {

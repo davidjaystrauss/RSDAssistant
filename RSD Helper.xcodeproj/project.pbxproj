@@ -32,41 +32,11 @@
 		B92255721ED9445C00342F56 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B92255711ED9445C00342F56 /* MediaPlayer.framework */; };
 		B92E80BB1EA7B9F600389DF8 /* RSDSearchHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B92E80BA1EA7B9F600389DF8 /* RSDSearchHeaderView.xib */; };
 		B92E80BD1EA7BA8300389DF8 /* RSDSearchHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B92E80BC1EA7BA8300389DF8 /* RSDSearchHeaderView.swift */; };
-		B94189F31ED01EFB00676F7E /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = B94189C61ED01EFB00676F7E /* README.md */; };
 		B9418A0D1ED55E3300676F7E /* RSDCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9418A0C1ED55E3300676F7E /* RSDCollectionViewCell.swift */; };
 		B974447E1EA5EE7A005838AF /* RSDDetailHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B974447D1EA5EE7A005838AF /* RSDDetailHeaderView.swift */; };
 		B97444801EA5EEC3005838AF /* RSDDetailHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B974447F1EA5EEC3005838AF /* RSDDetailHeaderView.xib */; };
 		B97444821EA5F485005838AF /* RSDFavoritesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97444811EA5F485005838AF /* RSDFavoritesViewController.swift */; };
-		B98E8EFC237274C2008F7827 /* rsdbf2019.json in Resources */ = {isa = PBXBuildFile; fileRef = B98E8EFB237274C2008F7827 /* rsdbf2019.json */; };
-		C01020011EA1F83800F1B1EF /* rsd-2020-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010011EA1F83800F1B1EF /* rsd-2020-us.json */; };
-		C01020021EA1F83800F1B1EF /* rsd-2020-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010021EA1F83800F1B1EF /* rsd-2020-canada.json */; };
-		C01020031EA1F83800F1B1EF /* rsd-2021-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010031EA1F83800F1B1EF /* rsd-2021-us.json */; };
-		C01020041EA1F83800F1B1EF /* rsd-black-friday-2021-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010041EA1F83800F1B1EF /* rsd-black-friday-2021-us.json */; };
-		C01020051EA1F83800F1B1EF /* rsd-2021-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010051EA1F83800F1B1EF /* rsd-2021-canada.json */; };
-		C01020061EA1F83800F1B1EF /* rsd-2022-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010061EA1F83800F1B1EF /* rsd-2022-us.json */; };
-		C01020071EA1F83800F1B1EF /* rsd-2022-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010071EA1F83800F1B1EF /* rsd-2022-canada.json */; };
-		C01020081EA1F83800F1B1EF /* rsd-black-friday-2022-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010081EA1F83800F1B1EF /* rsd-black-friday-2022-canada.json */; };
-		C01020091EA1F83800F1B1EF /* rsd-2022-australia.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010091EA1F83800F1B1EF /* rsd-2022-australia.json */; };
-		C01020101EA1F83800F1B1EF /* rsd-black-friday-2023-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010101EA1F83800F1B1EF /* rsd-black-friday-2023-us.json */; };
-		C01020111EA1F83800F1B1EF /* rsd-2023-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010111EA1F83800F1B1EF /* rsd-2023-canada.json */; };
-		C01020121EA1F83800F1B1EF /* rsd-black-friday-2023-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010121EA1F83800F1B1EF /* rsd-black-friday-2023-canada.json */; };
-		C01020131EA1F83800F1B1EF /* rsd-2023-germany.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010131EA1F83800F1B1EF /* rsd-2023-germany.json */; };
-		C01020141EA1F83800F1B1EF /* rsd-2023-italy.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010141EA1F83800F1B1EF /* rsd-2023-italy.json */; };
-		C01020151EA1F83800F1B1EF /* rsd-2023-uk.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010151EA1F83800F1B1EF /* rsd-2023-uk.json */; };
-		C01020161EA1F83800F1B1EF /* rsd-2024-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010161EA1F83800F1B1EF /* rsd-2024-us.json */; };
-		C01020171EA1F83800F1B1EF /* rsd-2024-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010171EA1F83800F1B1EF /* rsd-2024-canada.json */; };
-		C01020181EA1F83800F1B1EF /* rsd-2024-germany.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010181EA1F83800F1B1EF /* rsd-2024-germany.json */; };
-		C01020191EA1F83800F1B1EF /* rsd-2024-uk.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010191EA1F83800F1B1EF /* rsd-2024-uk.json */; };
-		C01020201EA1F83800F1B1EF /* rsd-2025-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010201EA1F83800F1B1EF /* rsd-2025-us.json */; };
-		C01020211EA1F83800F1B1EF /* rsd-2025-australia.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010211EA1F83800F1B1EF /* rsd-2025-australia.json */; };
-		C01020221EA1F83800F1B1EF /* rsd-2025-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010221EA1F83800F1B1EF /* rsd-2025-canada.json */; };
-		C01020231EA1F83800F1B1EF /* rsd-2025-germany.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010231EA1F83800F1B1EF /* rsd-2025-germany.json */; };
-		C00120241EA1F83800F1B1EF /* rsd-2026-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120231EA1F83800F1B1EF /* rsd-2026-us.json */; };
-		C00120261EA1F83800F1B1EF /* rsd-2026-australia.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120251EA1F83800F1B1EF /* rsd-2026-australia.json */; };
-		C00120281EA1F83800F1B1EF /* rsd-2026-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120271EA1F83800F1B1EF /* rsd-2026-canada.json */; };
-		C00120301EA1F83800F1B1EF /* rsd-2026-germany.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120291EA1F83800F1B1EF /* rsd-2026-germany.json */; };
-		C00120321EA1F83800F1B1EF /* rsd-2026-uk.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120311EA1F83800F1B1EF /* rsd-2026-uk.json */; };
-		C00120341EA1F83800F1B1EF /* stores-2026.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120331EA1F83800F1B1EF /* stores-2026.json */; };
+		B98E8EFC237274C2008F7827 /* data/releases/rsd-black-friday-2019.enriched.json in Resources */ = {isa = PBXBuildFile; fileRef = B98E8EFB237274C2008F7827 /* data/releases/rsd-black-friday-2019.enriched.json */; };
 		B99611911ED963EE00D4B0B5 /* Country.swift in Sources */ = {isa = PBXBuildFile; fileRef = B99611801ED963EE00D4B0B5 /* Country.swift */; };
 		B99611921ED963EE00D4B0B5 /* Dictionary+Merge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B99611811ED963EE00D4B0B5 /* Dictionary+Merge.swift */; };
 		B99611931ED963EE00D4B0B5 /* Entity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B99611821ED963EE00D4B0B5 /* Entity.swift */; };
@@ -81,7 +51,7 @@
 		B99611A01ED963EE00D4B0B5 /* String+URLEscaped.swift in Sources */ = {isa = PBXBuildFile; fileRef = B99611901ED963EE00D4B0B5 /* String+URLEscaped.swift */; };
 		B9C99F321EA5D1A8001E9473 /* RSDDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C99F311EA5D1A8001E9473 /* RSDDetailTableViewCell.swift */; };
 		B9C99F341EA5D21D001E9473 /* RSDDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9C99F331EA5D21D001E9473 /* RSDDetailViewController.swift */; };
-		B9D45B2620550B120097EC46 /* rsd2018.json in Resources */ = {isa = PBXBuildFile; fileRef = B9D45B2520550B120097EC46 /* rsd2018.json */; };
+		B9D45B2620550B120097EC46 /* data/releases/rsd-2018.enriched.json in Resources */ = {isa = PBXBuildFile; fileRef = B9D45B2520550B120097EC46 /* data/releases/rsd-2018.enriched.json */; };
 		B9F0E29F1EA1F83800F1B1EF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F0E29E1EA1F83800F1B1EF /* AppDelegate.swift */; };
 		B9F0E2A11EA1F83800F1B1EF /* RSDViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F0E2A01EA1F83800F1B1EF /* RSDViewController.swift */; };
 		B9F0E2A41EA1F83800F1B1EF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B9F0E2A21EA1F83800F1B1EF /* Main.storyboard */; };
@@ -92,12 +62,42 @@
 		B9F0E2CD1EA1FC4C00F1B1EF /* rsd.csv in Resources */ = {isa = PBXBuildFile; fileRef = B9F0E2CC1EA1FC4C00F1B1EF /* rsd.csv */; };
 		B9F0E2CF1EA1FC8300F1B1EF /* Listing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F0E2CE1EA1FC8300F1B1EF /* Listing.swift */; };
 		B9F0E2D11EA1FEF900F1B1EF /* RSDTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F0E2D01EA1FEF900F1B1EF /* RSDTableViewCell.swift */; };
-		B9F0E3031EA2999000F1B1EF /* rsd.json in Resources */ = {isa = PBXBuildFile; fileRef = B9F0E3021EA2999000F1B1EF /* rsd.json */; };
+		B9F0E3031EA2999000F1B1EF /* data/releases/rsd-2017.enriched.json in Resources */ = {isa = PBXBuildFile; fileRef = B9F0E3021EA2999000F1B1EF /* data/releases/rsd-2017.enriched.json */; };
 		B9F1AB782022DA4C0055AA61 /* RSDStoreMapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F1AB772022DA4C0055AA61 /* RSDStoreMapViewController.swift */; };
 		B9F1AB7A2022DF7C0055AA61 /* ParticipatingStores.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F1AB792022DF7C0055AA61 /* ParticipatingStores.swift */; };
 		B9F919901EFAF0120004FEA3 /* RSDCollectionSearchReusableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F9198E1EFAF0120004FEA3 /* RSDCollectionSearchReusableView.swift */; };
 		B9F919911EFAF0120004FEA3 /* RSDCollectionSearchReusableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = B9F9198F1EFAF0120004FEA3 /* RSDCollectionSearchReusableView.xib */; };
-		B9FB6CFE1FB2AEB900424459 /* rsdbf2017.json in Resources */ = {isa = PBXBuildFile; fileRef = B9FB6CFD1FB2AEB900424459 /* rsdbf2017.json */; };
+		B9FB6CFE1FB2AEB900424459 /* data/releases/rsd-black-friday-2017.enriched.json in Resources */ = {isa = PBXBuildFile; fileRef = B9FB6CFD1FB2AEB900424459 /* data/releases/rsd-black-friday-2017.enriched.json */; };
+		C00120241EA1F83800F1B1EF /* data/releases/rsd-2026-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120231EA1F83800F1B1EF /* data/releases/rsd-2026-us.json */; };
+		C00120261EA1F83800F1B1EF /* data/releases/rsd-2026-australia.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120251EA1F83800F1B1EF /* data/releases/rsd-2026-australia.json */; };
+		C00120281EA1F83800F1B1EF /* data/releases/rsd-2026-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120271EA1F83800F1B1EF /* data/releases/rsd-2026-canada.json */; };
+		C00120301EA1F83800F1B1EF /* data/releases/rsd-2026-germany.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120291EA1F83800F1B1EF /* data/releases/rsd-2026-germany.json */; };
+		C00120321EA1F83800F1B1EF /* data/releases/rsd-2026-uk.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120311EA1F83800F1B1EF /* data/releases/rsd-2026-uk.json */; };
+		C00120341EA1F83800F1B1EF /* data/stores-2026.json in Resources */ = {isa = PBXBuildFile; fileRef = C00120331EA1F83800F1B1EF /* data/stores-2026.json */; };
+		C01020011EA1F83800F1B1EF /* data/releases/rsd-2020-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010011EA1F83800F1B1EF /* data/releases/rsd-2020-us.json */; };
+		C01020021EA1F83800F1B1EF /* data/releases/rsd-2020-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010021EA1F83800F1B1EF /* data/releases/rsd-2020-canada.json */; };
+		C01020031EA1F83800F1B1EF /* data/releases/rsd-2021-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010031EA1F83800F1B1EF /* data/releases/rsd-2021-us.json */; };
+		C01020041EA1F83800F1B1EF /* data/releases/rsd-black-friday-2021-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010041EA1F83800F1B1EF /* data/releases/rsd-black-friday-2021-us.json */; };
+		C01020051EA1F83800F1B1EF /* data/releases/rsd-2021-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010051EA1F83800F1B1EF /* data/releases/rsd-2021-canada.json */; };
+		C01020061EA1F83800F1B1EF /* data/releases/rsd-2022-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010061EA1F83800F1B1EF /* data/releases/rsd-2022-us.json */; };
+		C01020071EA1F83800F1B1EF /* data/releases/rsd-2022-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010071EA1F83800F1B1EF /* data/releases/rsd-2022-canada.json */; };
+		C01020081EA1F83800F1B1EF /* data/releases/rsd-black-friday-2022-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010081EA1F83800F1B1EF /* data/releases/rsd-black-friday-2022-canada.json */; };
+		C01020091EA1F83800F1B1EF /* data/releases/rsd-2022-australia.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010091EA1F83800F1B1EF /* data/releases/rsd-2022-australia.json */; };
+		C01020101EA1F83800F1B1EF /* data/releases/rsd-black-friday-2023-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010101EA1F83800F1B1EF /* data/releases/rsd-black-friday-2023-us.json */; };
+		C01020111EA1F83800F1B1EF /* data/releases/rsd-2023-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010111EA1F83800F1B1EF /* data/releases/rsd-2023-canada.json */; };
+		C01020121EA1F83800F1B1EF /* data/releases/rsd-black-friday-2023-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010121EA1F83800F1B1EF /* data/releases/rsd-black-friday-2023-canada.json */; };
+		C01020131EA1F83800F1B1EF /* data/releases/rsd-2023-germany.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010131EA1F83800F1B1EF /* data/releases/rsd-2023-germany.json */; };
+		C01020141EA1F83800F1B1EF /* data/releases/rsd-2023-italy.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010141EA1F83800F1B1EF /* data/releases/rsd-2023-italy.json */; };
+		C01020151EA1F83800F1B1EF /* data/releases/rsd-2023-uk.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010151EA1F83800F1B1EF /* data/releases/rsd-2023-uk.json */; };
+		C01020161EA1F83800F1B1EF /* data/releases/rsd-2024-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010161EA1F83800F1B1EF /* data/releases/rsd-2024-us.json */; };
+		C01020171EA1F83800F1B1EF /* data/releases/rsd-2024-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010171EA1F83800F1B1EF /* data/releases/rsd-2024-canada.json */; };
+		C01020181EA1F83800F1B1EF /* data/releases/rsd-2024-germany.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010181EA1F83800F1B1EF /* data/releases/rsd-2024-germany.json */; };
+		C01020191EA1F83800F1B1EF /* data/releases/rsd-2024-uk.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010191EA1F83800F1B1EF /* data/releases/rsd-2024-uk.json */; };
+		C01020201EA1F83800F1B1EF /* data/releases/rsd-2025-us.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010201EA1F83800F1B1EF /* data/releases/rsd-2025-us.json */; };
+		C01020211EA1F83800F1B1EF /* data/releases/rsd-2025-australia.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010211EA1F83800F1B1EF /* data/releases/rsd-2025-australia.json */; };
+		C01020221EA1F83800F1B1EF /* data/releases/rsd-2025-canada.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010221EA1F83800F1B1EF /* data/releases/rsd-2025-canada.json */; };
+		C01020231EA1F83800F1B1EF /* data/releases/rsd-2025-germany.json in Resources */ = {isa = PBXBuildFile; fileRef = C01010231EA1F83800F1B1EF /* data/releases/rsd-2025-germany.json */; };
+		C82A95812F75B37C008A2DEE /* RSDIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = C82A95802F75B37C008A2DEE /* RSDIcon.icon */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -150,36 +150,7 @@
 		B974447D1EA5EE7A005838AF /* RSDDetailHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSDDetailHeaderView.swift; sourceTree = "<group>"; };
 		B974447F1EA5EEC3005838AF /* RSDDetailHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RSDDetailHeaderView.xib; sourceTree = "<group>"; };
 		B97444811EA5F485005838AF /* RSDFavoritesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSDFavoritesViewController.swift; sourceTree = "<group>"; };
-		B98E8EFB237274C2008F7827 /* rsdbf2019.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2019.enriched.json"; sourceTree = SOURCE_ROOT; };
-		C01010011EA1F83800F1B1EF /* rsd-2020-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2020-us.json"; sourceTree = SOURCE_ROOT; };
-		C01010021EA1F83800F1B1EF /* rsd-2020-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2020-canada.json"; sourceTree = SOURCE_ROOT; };
-		C01010031EA1F83800F1B1EF /* rsd-2021-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2021-us.json"; sourceTree = SOURCE_ROOT; };
-		C01010041EA1F83800F1B1EF /* rsd-black-friday-2021-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2021-us.json"; sourceTree = SOURCE_ROOT; };
-		C01010051EA1F83800F1B1EF /* rsd-2021-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2021-canada.json"; sourceTree = SOURCE_ROOT; };
-		C01010061EA1F83800F1B1EF /* rsd-2022-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2022-us.json"; sourceTree = SOURCE_ROOT; };
-		C01010071EA1F83800F1B1EF /* rsd-2022-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2022-canada.json"; sourceTree = SOURCE_ROOT; };
-		C01010081EA1F83800F1B1EF /* rsd-black-friday-2022-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2022-canada.json"; sourceTree = SOURCE_ROOT; };
-		C01010091EA1F83800F1B1EF /* rsd-2022-australia.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2022-australia.json"; sourceTree = SOURCE_ROOT; };
-		C01010101EA1F83800F1B1EF /* rsd-black-friday-2023-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2023-us.json"; sourceTree = SOURCE_ROOT; };
-		C01010111EA1F83800F1B1EF /* rsd-2023-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2023-canada.json"; sourceTree = SOURCE_ROOT; };
-		C01010121EA1F83800F1B1EF /* rsd-black-friday-2023-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2023-canada.json"; sourceTree = SOURCE_ROOT; };
-		C01010131EA1F83800F1B1EF /* rsd-2023-germany.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2023-germany.json"; sourceTree = SOURCE_ROOT; };
-		C01010141EA1F83800F1B1EF /* rsd-2023-italy.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2023-italy.json"; sourceTree = SOURCE_ROOT; };
-		C01010151EA1F83800F1B1EF /* rsd-2023-uk.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2023-uk.json"; sourceTree = SOURCE_ROOT; };
-		C01010161EA1F83800F1B1EF /* rsd-2024-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2024-us.json"; sourceTree = SOURCE_ROOT; };
-		C01010171EA1F83800F1B1EF /* rsd-2024-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2024-canada.json"; sourceTree = SOURCE_ROOT; };
-		C01010181EA1F83800F1B1EF /* rsd-2024-germany.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2024-germany.json"; sourceTree = SOURCE_ROOT; };
-		C01010191EA1F83800F1B1EF /* rsd-2024-uk.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2024-uk.json"; sourceTree = SOURCE_ROOT; };
-		C01010201EA1F83800F1B1EF /* rsd-2025-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2025-us.json"; sourceTree = SOURCE_ROOT; };
-		C01010211EA1F83800F1B1EF /* rsd-2025-australia.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2025-australia.json"; sourceTree = SOURCE_ROOT; };
-		C01010221EA1F83800F1B1EF /* rsd-2025-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2025-canada.json"; sourceTree = SOURCE_ROOT; };
-		C01010231EA1F83800F1B1EF /* rsd-2025-germany.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2025-germany.json"; sourceTree = SOURCE_ROOT; };
-		C00120231EA1F83800F1B1EF /* rsd-2026-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2026-us.json"; sourceTree = SOURCE_ROOT; };
-		C00120251EA1F83800F1B1EF /* rsd-2026-australia.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2026-australia.json"; sourceTree = SOURCE_ROOT; };
-		C00120271EA1F83800F1B1EF /* rsd-2026-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2026-canada.json"; sourceTree = SOURCE_ROOT; };
-		C00120291EA1F83800F1B1EF /* rsd-2026-germany.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2026-germany.json"; sourceTree = SOURCE_ROOT; };
-		C00120311EA1F83800F1B1EF /* rsd-2026-uk.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2026-uk.json"; sourceTree = SOURCE_ROOT; };
-		C00120331EA1F83800F1B1EF /* stores-2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/stores-2026.json"; sourceTree = SOURCE_ROOT; };
+		B98E8EFB237274C2008F7827 /* data/releases/rsd-black-friday-2019.enriched.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2019.enriched.json"; sourceTree = SOURCE_ROOT; };
 		B99611801ED963EE00D4B0B5 /* Country.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Country.swift; sourceTree = "<group>"; };
 		B99611811ED963EE00D4B0B5 /* Dictionary+Merge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Dictionary+Merge.swift"; sourceTree = "<group>"; };
 		B99611821ED963EE00D4B0B5 /* Entity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Entity.swift; sourceTree = "<group>"; };
@@ -195,7 +166,7 @@
 		B99611901ED963EE00D4B0B5 /* String+URLEscaped.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+URLEscaped.swift"; sourceTree = "<group>"; };
 		B9C99F311EA5D1A8001E9473 /* RSDDetailTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSDDetailTableViewCell.swift; sourceTree = "<group>"; };
 		B9C99F331EA5D21D001E9473 /* RSDDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSDDetailViewController.swift; sourceTree = "<group>"; };
-		B9D45B2520550B120097EC46 /* rsd2018.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2018.enriched.json"; sourceTree = SOURCE_ROOT; };
+		B9D45B2520550B120097EC46 /* data/releases/rsd-2018.enriched.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2018.enriched.json"; sourceTree = SOURCE_ROOT; };
 		B9F0E29B1EA1F83800F1B1EF /* RSD Helper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "RSD Helper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9F0E29E1EA1F83800F1B1EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B9F0E2A01EA1F83800F1B1EF /* RSDViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSDViewController.swift; sourceTree = "<group>"; };
@@ -212,12 +183,42 @@
 		B9F0E2CC1EA1FC4C00F1B1EF /* rsd.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = rsd.csv; sourceTree = "<group>"; };
 		B9F0E2CE1EA1FC8300F1B1EF /* Listing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Listing.swift; sourceTree = "<group>"; };
 		B9F0E2D01EA1FEF900F1B1EF /* RSDTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSDTableViewCell.swift; sourceTree = "<group>"; };
-		B9F0E3021EA2999000F1B1EF /* rsd.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "data/releases/rsd-2017.enriched.json"; sourceTree = SOURCE_ROOT; };
+		B9F0E3021EA2999000F1B1EF /* data/releases/rsd-2017.enriched.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "data/releases/rsd-2017.enriched.json"; sourceTree = SOURCE_ROOT; };
 		B9F1AB772022DA4C0055AA61 /* RSDStoreMapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSDStoreMapViewController.swift; sourceTree = "<group>"; };
 		B9F1AB792022DF7C0055AA61 /* ParticipatingStores.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipatingStores.swift; sourceTree = "<group>"; };
 		B9F9198E1EFAF0120004FEA3 /* RSDCollectionSearchReusableView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RSDCollectionSearchReusableView.swift; sourceTree = "<group>"; };
 		B9F9198F1EFAF0120004FEA3 /* RSDCollectionSearchReusableView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RSDCollectionSearchReusableView.xib; sourceTree = "<group>"; };
-		B9FB6CFD1FB2AEB900424459 /* rsdbf2017.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2017.enriched.json"; sourceTree = SOURCE_ROOT; };
+		B9FB6CFD1FB2AEB900424459 /* data/releases/rsd-black-friday-2017.enriched.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2017.enriched.json"; sourceTree = SOURCE_ROOT; };
+		C00120231EA1F83800F1B1EF /* data/releases/rsd-2026-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2026-us.json"; sourceTree = SOURCE_ROOT; };
+		C00120251EA1F83800F1B1EF /* data/releases/rsd-2026-australia.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2026-australia.json"; sourceTree = SOURCE_ROOT; };
+		C00120271EA1F83800F1B1EF /* data/releases/rsd-2026-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2026-canada.json"; sourceTree = SOURCE_ROOT; };
+		C00120291EA1F83800F1B1EF /* data/releases/rsd-2026-germany.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2026-germany.json"; sourceTree = SOURCE_ROOT; };
+		C00120311EA1F83800F1B1EF /* data/releases/rsd-2026-uk.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2026-uk.json"; sourceTree = SOURCE_ROOT; };
+		C00120331EA1F83800F1B1EF /* data/stores-2026.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/stores-2026.json"; sourceTree = SOURCE_ROOT; };
+		C01010011EA1F83800F1B1EF /* data/releases/rsd-2020-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2020-us.json"; sourceTree = SOURCE_ROOT; };
+		C01010021EA1F83800F1B1EF /* data/releases/rsd-2020-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2020-canada.json"; sourceTree = SOURCE_ROOT; };
+		C01010031EA1F83800F1B1EF /* data/releases/rsd-2021-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2021-us.json"; sourceTree = SOURCE_ROOT; };
+		C01010041EA1F83800F1B1EF /* data/releases/rsd-black-friday-2021-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2021-us.json"; sourceTree = SOURCE_ROOT; };
+		C01010051EA1F83800F1B1EF /* data/releases/rsd-2021-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2021-canada.json"; sourceTree = SOURCE_ROOT; };
+		C01010061EA1F83800F1B1EF /* data/releases/rsd-2022-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2022-us.json"; sourceTree = SOURCE_ROOT; };
+		C01010071EA1F83800F1B1EF /* data/releases/rsd-2022-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2022-canada.json"; sourceTree = SOURCE_ROOT; };
+		C01010081EA1F83800F1B1EF /* data/releases/rsd-black-friday-2022-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2022-canada.json"; sourceTree = SOURCE_ROOT; };
+		C01010091EA1F83800F1B1EF /* data/releases/rsd-2022-australia.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2022-australia.json"; sourceTree = SOURCE_ROOT; };
+		C01010101EA1F83800F1B1EF /* data/releases/rsd-black-friday-2023-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2023-us.json"; sourceTree = SOURCE_ROOT; };
+		C01010111EA1F83800F1B1EF /* data/releases/rsd-2023-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2023-canada.json"; sourceTree = SOURCE_ROOT; };
+		C01010121EA1F83800F1B1EF /* data/releases/rsd-black-friday-2023-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-black-friday-2023-canada.json"; sourceTree = SOURCE_ROOT; };
+		C01010131EA1F83800F1B1EF /* data/releases/rsd-2023-germany.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2023-germany.json"; sourceTree = SOURCE_ROOT; };
+		C01010141EA1F83800F1B1EF /* data/releases/rsd-2023-italy.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2023-italy.json"; sourceTree = SOURCE_ROOT; };
+		C01010151EA1F83800F1B1EF /* data/releases/rsd-2023-uk.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2023-uk.json"; sourceTree = SOURCE_ROOT; };
+		C01010161EA1F83800F1B1EF /* data/releases/rsd-2024-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2024-us.json"; sourceTree = SOURCE_ROOT; };
+		C01010171EA1F83800F1B1EF /* data/releases/rsd-2024-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2024-canada.json"; sourceTree = SOURCE_ROOT; };
+		C01010181EA1F83800F1B1EF /* data/releases/rsd-2024-germany.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2024-germany.json"; sourceTree = SOURCE_ROOT; };
+		C01010191EA1F83800F1B1EF /* data/releases/rsd-2024-uk.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2024-uk.json"; sourceTree = SOURCE_ROOT; };
+		C01010201EA1F83800F1B1EF /* data/releases/rsd-2025-us.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2025-us.json"; sourceTree = SOURCE_ROOT; };
+		C01010211EA1F83800F1B1EF /* data/releases/rsd-2025-australia.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2025-australia.json"; sourceTree = SOURCE_ROOT; };
+		C01010221EA1F83800F1B1EF /* data/releases/rsd-2025-canada.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2025-canada.json"; sourceTree = SOURCE_ROOT; };
+		C01010231EA1F83800F1B1EF /* data/releases/rsd-2025-germany.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "data/releases/rsd-2025-germany.json"; sourceTree = SOURCE_ROOT; };
+		C82A95802F75B37C008A2DEE /* RSDIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = RSDIcon.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -319,6 +320,7 @@
 				B9F0E2BD1EA1F83900F1B1EF /* RSD HelperUITests */,
 				B9F0E29C1EA1F83800F1B1EF /* Products */,
 				4DDD7C1C2245A845C632AC10 /* Frameworks */,
+				C82A957F2F75B35C008A2DEE /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -337,39 +339,39 @@
 			children = (
 				B9F0E2CC1EA1FC4C00F1B1EF /* rsd.csv */,
 				B9F0E2CE1EA1FC8300F1B1EF /* Listing.swift */,
-				B9F0E3021EA2999000F1B1EF /* rsd.json */,
-				B9FB6CFD1FB2AEB900424459 /* rsdbf2017.json */,
-				B9D45B2520550B120097EC46 /* rsd2018.json */,
-				B98E8EFB237274C2008F7827 /* rsdbf2019.json */,
-				C01010011EA1F83800F1B1EF /* rsd-2020-us.json */,
-				C01010021EA1F83800F1B1EF /* rsd-2020-canada.json */,
-				C01010031EA1F83800F1B1EF /* rsd-2021-us.json */,
-				C01010041EA1F83800F1B1EF /* rsd-black-friday-2021-us.json */,
-				C01010051EA1F83800F1B1EF /* rsd-2021-canada.json */,
-				C01010061EA1F83800F1B1EF /* rsd-2022-us.json */,
-				C01010071EA1F83800F1B1EF /* rsd-2022-canada.json */,
-				C01010081EA1F83800F1B1EF /* rsd-black-friday-2022-canada.json */,
-				C01010091EA1F83800F1B1EF /* rsd-2022-australia.json */,
-				C01010101EA1F83800F1B1EF /* rsd-black-friday-2023-us.json */,
-				C01010111EA1F83800F1B1EF /* rsd-2023-canada.json */,
-				C01010121EA1F83800F1B1EF /* rsd-black-friday-2023-canada.json */,
-				C01010131EA1F83800F1B1EF /* rsd-2023-germany.json */,
-				C01010141EA1F83800F1B1EF /* rsd-2023-italy.json */,
-				C01010151EA1F83800F1B1EF /* rsd-2023-uk.json */,
-				C01010161EA1F83800F1B1EF /* rsd-2024-us.json */,
-				C01010171EA1F83800F1B1EF /* rsd-2024-canada.json */,
-				C01010181EA1F83800F1B1EF /* rsd-2024-germany.json */,
-				C01010191EA1F83800F1B1EF /* rsd-2024-uk.json */,
-				C01010201EA1F83800F1B1EF /* rsd-2025-us.json */,
-				C01010211EA1F83800F1B1EF /* rsd-2025-australia.json */,
-				C01010221EA1F83800F1B1EF /* rsd-2025-canada.json */,
-				C01010231EA1F83800F1B1EF /* rsd-2025-germany.json */,
-				C00120231EA1F83800F1B1EF /* rsd-2026-us.json */,
-				C00120251EA1F83800F1B1EF /* rsd-2026-australia.json */,
-				C00120271EA1F83800F1B1EF /* rsd-2026-canada.json */,
-				C00120291EA1F83800F1B1EF /* rsd-2026-germany.json */,
-				C00120311EA1F83800F1B1EF /* rsd-2026-uk.json */,
-				C00120331EA1F83800F1B1EF /* stores-2026.json */,
+				B9F0E3021EA2999000F1B1EF /* data/releases/rsd-2017.enriched.json */,
+				B9FB6CFD1FB2AEB900424459 /* data/releases/rsd-black-friday-2017.enriched.json */,
+				B9D45B2520550B120097EC46 /* data/releases/rsd-2018.enriched.json */,
+				B98E8EFB237274C2008F7827 /* data/releases/rsd-black-friday-2019.enriched.json */,
+				C01010011EA1F83800F1B1EF /* data/releases/rsd-2020-us.json */,
+				C01010021EA1F83800F1B1EF /* data/releases/rsd-2020-canada.json */,
+				C01010031EA1F83800F1B1EF /* data/releases/rsd-2021-us.json */,
+				C01010041EA1F83800F1B1EF /* data/releases/rsd-black-friday-2021-us.json */,
+				C01010051EA1F83800F1B1EF /* data/releases/rsd-2021-canada.json */,
+				C01010061EA1F83800F1B1EF /* data/releases/rsd-2022-us.json */,
+				C01010071EA1F83800F1B1EF /* data/releases/rsd-2022-canada.json */,
+				C01010081EA1F83800F1B1EF /* data/releases/rsd-black-friday-2022-canada.json */,
+				C01010091EA1F83800F1B1EF /* data/releases/rsd-2022-australia.json */,
+				C01010101EA1F83800F1B1EF /* data/releases/rsd-black-friday-2023-us.json */,
+				C01010111EA1F83800F1B1EF /* data/releases/rsd-2023-canada.json */,
+				C01010121EA1F83800F1B1EF /* data/releases/rsd-black-friday-2023-canada.json */,
+				C01010131EA1F83800F1B1EF /* data/releases/rsd-2023-germany.json */,
+				C01010141EA1F83800F1B1EF /* data/releases/rsd-2023-italy.json */,
+				C01010151EA1F83800F1B1EF /* data/releases/rsd-2023-uk.json */,
+				C01010161EA1F83800F1B1EF /* data/releases/rsd-2024-us.json */,
+				C01010171EA1F83800F1B1EF /* data/releases/rsd-2024-canada.json */,
+				C01010181EA1F83800F1B1EF /* data/releases/rsd-2024-germany.json */,
+				C01010191EA1F83800F1B1EF /* data/releases/rsd-2024-uk.json */,
+				C01010201EA1F83800F1B1EF /* data/releases/rsd-2025-us.json */,
+				C01010211EA1F83800F1B1EF /* data/releases/rsd-2025-australia.json */,
+				C01010221EA1F83800F1B1EF /* data/releases/rsd-2025-canada.json */,
+				C01010231EA1F83800F1B1EF /* data/releases/rsd-2025-germany.json */,
+				C00120231EA1F83800F1B1EF /* data/releases/rsd-2026-us.json */,
+				C00120251EA1F83800F1B1EF /* data/releases/rsd-2026-australia.json */,
+				C00120271EA1F83800F1B1EF /* data/releases/rsd-2026-canada.json */,
+				C00120291EA1F83800F1B1EF /* data/releases/rsd-2026-germany.json */,
+				C00120311EA1F83800F1B1EF /* data/releases/rsd-2026-uk.json */,
+				C00120331EA1F83800F1B1EF /* data/stores-2026.json */,
 				B9F0E29E1EA1F83800F1B1EF /* AppDelegate.swift */,
 				B9F0E2A01EA1F83800F1B1EF /* RSDViewController.swift */,
 				B9F1AB792022DF7C0055AA61 /* ParticipatingStores.swift */,
@@ -385,6 +387,7 @@
 				B974447D1EA5EE7A005838AF /* RSDDetailHeaderView.swift */,
 				B9C99F331EA5D21D001E9473 /* RSDDetailViewController.swift */,
 				B9C99F311EA5D1A8001E9473 /* RSDDetailTableViewCell.swift */,
+				C82A95802F75B37C008A2DEE /* RSDIcon.icon */,
 				B9F0E2A51EA1F83800F1B1EF /* Assets.xcassets */,
 				B9F0E2A71EA1F83800F1B1EF /* LaunchScreen.storyboard */,
 				B9F0E2AA1EA1F83800F1B1EF /* Info.plist */,
@@ -409,6 +412,14 @@
 				B9F0E2C01EA1F83900F1B1EF /* Info.plist */,
 			);
 			path = "RSD HelperUITests";
+			sourceTree = "<group>";
+		};
+		C82A957F2F75B35C008A2DEE /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				B94189C61ED01EFB00676F7E /* README.md */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -525,43 +536,44 @@
 			files = (
 				B97444801EA5EEC3005838AF /* RSDDetailHeaderView.xib in Resources */,
 				B9F919911EFAF0120004FEA3 /* RSDCollectionSearchReusableView.xib in Resources */,
-				B9FB6CFE1FB2AEB900424459 /* rsdbf2017.json in Resources */,
+				B9FB6CFE1FB2AEB900424459 /* data/releases/rsd-black-friday-2017.enriched.json in Resources */,
 				B9F0E2A91EA1F83800F1B1EF /* LaunchScreen.storyboard in Resources */,
 				B9F0E2A61EA1F83800F1B1EF /* Assets.xcassets in Resources */,
 				B9F0E2CD1EA1FC4C00F1B1EF /* rsd.csv in Resources */,
-				B9F0E3031EA2999000F1B1EF /* rsd.json in Resources */,
+				B9F0E3031EA2999000F1B1EF /* data/releases/rsd-2017.enriched.json in Resources */,
 				B92E80BB1EA7B9F600389DF8 /* RSDSearchHeaderView.xib in Resources */,
-				B98E8EFC237274C2008F7827 /* rsdbf2019.json in Resources */,
-				B9D45B2620550B120097EC46 /* rsd2018.json in Resources */,
-				C01020011EA1F83800F1B1EF /* rsd-2020-us.json in Resources */,
-				C01020021EA1F83800F1B1EF /* rsd-2020-canada.json in Resources */,
-				C01020031EA1F83800F1B1EF /* rsd-2021-us.json in Resources */,
-				C01020041EA1F83800F1B1EF /* rsd-black-friday-2021-us.json in Resources */,
-				C01020051EA1F83800F1B1EF /* rsd-2021-canada.json in Resources */,
-				C01020061EA1F83800F1B1EF /* rsd-2022-us.json in Resources */,
-				C01020071EA1F83800F1B1EF /* rsd-2022-canada.json in Resources */,
-				C01020081EA1F83800F1B1EF /* rsd-black-friday-2022-canada.json in Resources */,
-				C01020091EA1F83800F1B1EF /* rsd-2022-australia.json in Resources */,
-				C01020101EA1F83800F1B1EF /* rsd-black-friday-2023-us.json in Resources */,
-				C01020111EA1F83800F1B1EF /* rsd-2023-canada.json in Resources */,
-				C01020121EA1F83800F1B1EF /* rsd-black-friday-2023-canada.json in Resources */,
-				C01020131EA1F83800F1B1EF /* rsd-2023-germany.json in Resources */,
-				C01020141EA1F83800F1B1EF /* rsd-2023-italy.json in Resources */,
-				C01020151EA1F83800F1B1EF /* rsd-2023-uk.json in Resources */,
-				C01020161EA1F83800F1B1EF /* rsd-2024-us.json in Resources */,
-				C01020171EA1F83800F1B1EF /* rsd-2024-canada.json in Resources */,
-				C01020181EA1F83800F1B1EF /* rsd-2024-germany.json in Resources */,
-				C01020191EA1F83800F1B1EF /* rsd-2024-uk.json in Resources */,
-				C01020201EA1F83800F1B1EF /* rsd-2025-us.json in Resources */,
-				C01020211EA1F83800F1B1EF /* rsd-2025-australia.json in Resources */,
-				C01020221EA1F83800F1B1EF /* rsd-2025-canada.json in Resources */,
-				C01020231EA1F83800F1B1EF /* rsd-2025-germany.json in Resources */,
-				C00120241EA1F83800F1B1EF /* rsd-2026-us.json in Resources */,
-				C00120261EA1F83800F1B1EF /* rsd-2026-australia.json in Resources */,
-				C00120281EA1F83800F1B1EF /* rsd-2026-canada.json in Resources */,
-				C00120301EA1F83800F1B1EF /* rsd-2026-germany.json in Resources */,
-				C00120321EA1F83800F1B1EF /* rsd-2026-uk.json in Resources */,
-				C00120341EA1F83800F1B1EF /* stores-2026.json in Resources */,
+				B98E8EFC237274C2008F7827 /* data/releases/rsd-black-friday-2019.enriched.json in Resources */,
+				B9D45B2620550B120097EC46 /* data/releases/rsd-2018.enriched.json in Resources */,
+				C01020011EA1F83800F1B1EF /* data/releases/rsd-2020-us.json in Resources */,
+				C01020021EA1F83800F1B1EF /* data/releases/rsd-2020-canada.json in Resources */,
+				C01020031EA1F83800F1B1EF /* data/releases/rsd-2021-us.json in Resources */,
+				C01020041EA1F83800F1B1EF /* data/releases/rsd-black-friday-2021-us.json in Resources */,
+				C01020051EA1F83800F1B1EF /* data/releases/rsd-2021-canada.json in Resources */,
+				C01020061EA1F83800F1B1EF /* data/releases/rsd-2022-us.json in Resources */,
+				C01020071EA1F83800F1B1EF /* data/releases/rsd-2022-canada.json in Resources */,
+				C01020081EA1F83800F1B1EF /* data/releases/rsd-black-friday-2022-canada.json in Resources */,
+				C01020091EA1F83800F1B1EF /* data/releases/rsd-2022-australia.json in Resources */,
+				C01020101EA1F83800F1B1EF /* data/releases/rsd-black-friday-2023-us.json in Resources */,
+				C01020111EA1F83800F1B1EF /* data/releases/rsd-2023-canada.json in Resources */,
+				C01020121EA1F83800F1B1EF /* data/releases/rsd-black-friday-2023-canada.json in Resources */,
+				C82A95812F75B37C008A2DEE /* RSDIcon.icon in Resources */,
+				C01020131EA1F83800F1B1EF /* data/releases/rsd-2023-germany.json in Resources */,
+				C01020141EA1F83800F1B1EF /* data/releases/rsd-2023-italy.json in Resources */,
+				C01020151EA1F83800F1B1EF /* data/releases/rsd-2023-uk.json in Resources */,
+				C01020161EA1F83800F1B1EF /* data/releases/rsd-2024-us.json in Resources */,
+				C01020171EA1F83800F1B1EF /* data/releases/rsd-2024-canada.json in Resources */,
+				C01020181EA1F83800F1B1EF /* data/releases/rsd-2024-germany.json in Resources */,
+				C01020191EA1F83800F1B1EF /* data/releases/rsd-2024-uk.json in Resources */,
+				C01020201EA1F83800F1B1EF /* data/releases/rsd-2025-us.json in Resources */,
+				C01020211EA1F83800F1B1EF /* data/releases/rsd-2025-australia.json in Resources */,
+				C01020221EA1F83800F1B1EF /* data/releases/rsd-2025-canada.json in Resources */,
+				C01020231EA1F83800F1B1EF /* data/releases/rsd-2025-germany.json in Resources */,
+				C00120241EA1F83800F1B1EF /* data/releases/rsd-2026-us.json in Resources */,
+				C00120261EA1F83800F1B1EF /* data/releases/rsd-2026-australia.json in Resources */,
+				C00120281EA1F83800F1B1EF /* data/releases/rsd-2026-canada.json in Resources */,
+				C00120301EA1F83800F1B1EF /* data/releases/rsd-2026-germany.json in Resources */,
+				C00120321EA1F83800F1B1EF /* data/releases/rsd-2026-uk.json in Resources */,
+				C00120341EA1F83800F1B1EF /* data/stores-2026.json in Resources */,
 				B9F0E2A41EA1F83800F1B1EF /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -592,7 +604,6 @@
 				B99611921ED963EE00D4B0B5 /* Dictionary+Merge.swift in Sources */,
 				B9F1AB7A2022DF7C0055AA61 /* ParticipatingStores.swift in Sources */,
 				B9418A0D1ED55E3300676F7E /* RSDCollectionViewCell.swift in Sources */,
-				B94189F31ED01EFB00676F7E /* README.md in Sources */,
 				B922556B1ED80AE600342F56 /* Resource.swift in Sources */,
 				B996119C1ED963EE00D4B0B5 /* Media.swift in Sources */,
 				B92255591ED80AE600342F56 /* AnimatedImageView.swift in Sources */,
@@ -799,44 +810,48 @@
 		B9F0E2C41EA1F83900F1B1EF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = RSDIcon;
 				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = NO;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "RSD Helper/RSD Helper.entitlements";
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FY6K74QNM5;
 				INFOPLIST_FILE = "RSD Helper/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 3.0.0;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.dstrauss.RSD-Helper";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Debug;
 		};
 		B9F0E2C51EA1F83900F1B1EF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = RSDIcon;
 				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = NO;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "RSD Helper/RSD Helper.entitlements";
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FY6K74QNM5;
 				INFOPLIST_FILE = "RSD Helper/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 2.0.1;
+				MARKETING_VERSION = 3.0.0;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.dstrauss.RSD-Helper";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Release;
 		};

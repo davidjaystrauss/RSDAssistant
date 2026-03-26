@@ -1,0 +1,189 @@
+{
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:0.00000,0.47843,1.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "hidden" : false,
+      "layers" : [
+        {
+          "blend-mode-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            }
+          ],
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "handle-inner.svg",
+          "name" : "handle-inner",
+          "position" : {
+            "scale" : 0.95,
+            "translation-in-points" : [
+              -1.164306640625,
+              -42.15228271484375
+            ]
+          }
+        },
+        {
+          "blend-mode-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : "normal"
+            }
+          ],
+          "fill" : "automatic",
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "handle-outer.svg",
+          "name" : "handle-outer",
+          "position" : {
+            "scale" : 0.95,
+            "translation-in-points" : [
+              -1.164306640625,
+              -42.15228271484375
+            ]
+          }
+        },
+        {
+          "fill" : {
+            "automatic-gradient" : "display-p3:0.97118,1.00000,0.97538,1.00000"
+          },
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "bag-body.svg",
+          "name" : "bag-body",
+          "position" : {
+            "scale" : 0.95,
+            "translation-in-points" : [
+              -1.164306640625,
+              -42.15228271484375
+            ]
+          }
+        },
+        {
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "bag-band.svg",
+          "name" : "bag-band",
+          "position" : {
+            "scale" : 0.95,
+            "translation-in-points" : [
+              -1.164306640625,
+              -42.15228271484375
+            ]
+          }
+        },
+        {
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "spindle-hole.svg",
+          "name" : "spindle-hole",
+          "position" : {
+            "scale" : 1.15,
+            "translation-in-points" : [
+              -1.164306640625,
+              -6.952282714843818
+            ]
+          }
+        },
+        {
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "groove-inner.svg",
+          "name" : "groove-inner",
+          "position" : {
+            "scale" : 1.15,
+            "translation-in-points" : [
+              -1.164306640625,
+              -6.952282714843818
+            ]
+          }
+        },
+        {
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "groove-outer.svg",
+          "name" : "groove-outer",
+          "position" : {
+            "scale" : 1.15,
+            "translation-in-points" : [
+              -1.164306640625,
+              -6.952282714843818
+            ]
+          }
+        },
+        {
+          "fill-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : {
+                "solid" : "display-p3:0.96012,0.96611,0.90929,1.00000"
+              }
+            }
+          ],
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "label-inner.svg",
+          "name" : "label-inner",
+          "position" : {
+            "scale" : 1.15,
+            "translation-in-points" : [
+              -1.164306640625,
+              -6.952282714843818
+            ]
+          }
+        },
+        {
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "label-outer.svg",
+          "name" : "label-outer",
+          "position" : {
+            "scale" : 1.15,
+            "translation-in-points" : [
+              -1.164306640625,
+              -6.952282714843818
+            ]
+          }
+        },
+        {
+          "fill" : "automatic",
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "record-body.svg",
+          "name" : "record-body",
+          "position" : {
+            "scale" : 1.15,
+            "translation-in-points" : [
+              -1.164306640625,
+              -6.952282714843818
+            ]
+          }
+        }
+      ],
+      "name" : "canada",
+      "position" : {
+        "scale" : 1,
+        "translation-in-points" : [
+          1.164306640625,
+          -6.47271728515625
+        ]
+      },
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

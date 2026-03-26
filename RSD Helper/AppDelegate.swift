@@ -55,6 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     enum Shortcut: String {
         case favorites = "Favorites"
+        case stores = "Stores"
     }
     
     func handleQuickAction(shortcutItem: UIApplicationShortcutItem) -> Bool {
@@ -65,6 +66,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             switch shortcutType {
             case .favorites:
                 RSDAppState.shared.presentedSheet = .favorites
+                quickActionHandled = true
+            case .stores:
+                RSDAppState.shared.presentedSheet = .stores
                 quickActionHandled = true
             }
         }

@@ -175,7 +175,6 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
     private let selectedStoreBadgeLabel = UILabel()
     private let selectedStoreTitleLabel = UILabel()
     private let selectedStoreSubtitleLabel = UILabel()
-    private let clearSelectionButton = UIButton(type: .system)
     private let mapControlsView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
     private let currentLocationButton = UIButton(type: .system)
     private let mapTypeButton = UIButton(type: .system)
@@ -185,12 +184,14 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
     private let grabberView = UIView()
     private let sheetTitleLabel = UILabel()
     private let sheetCountLabel = UILabel()
+    private let sheetCountSeparatorLabel = UILabel()
+    private let sheetCountSpinner = UIActivityIndicatorView(style: .medium)
     private let searchBar = UISearchBar()
     private var sheetHeightConstraint: NSLayoutConstraint?
-    private let collapsedHeight: CGFloat = 196
-    private let expandedHeight: CGFloat = 520
-    private var currentSheetHeight: CGFloat = 240
-    private var sheetPanStartHeight: CGFloat = 240
+    private let collapsedHeight: CGFloat = 160
+    private let expandedHeight: CGFloat = 476
+    private var currentSheetHeight: CGFloat = 204
+    private var sheetPanStartHeight: CGFloat = 204
 
     private var onMapStores: [ParticipatingStoreRecord] {
         let visibleStores = filteredStores.filter { store in
@@ -240,20 +241,13 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
         selectedStoreSubtitleLabel.font = .preferredFont(forTextStyle: .subheadline)
         selectedStoreSubtitleLabel.textColor = .secondaryLabel
         selectedStoreSubtitleLabel.numberOfLines = 2
-        clearSelectionButton.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
-        clearSelectionButton.tintColor = .tertiaryLabel
-        clearSelectionButton.addTarget(self, action: #selector(clearSelectedStore), for: .touchUpInside)
 
         let selectedTextStack = UIStackView(arrangedSubviews: [selectedStoreBadgeLabel, selectedStoreTitleLabel, selectedStoreSubtitleLabel])
         selectedTextStack.axis = .vertical
         selectedTextStack.spacing = 3
 
-        let selectedRow = UIStackView(arrangedSubviews: [selectedTextStack, clearSelectionButton])
-        selectedRow.axis = .horizontal
-        selectedRow.spacing = 12
-        selectedRow.alignment = .top
-        selectedRow.translatesAutoresizingMaskIntoConstraints = false
-        selectedStoreCard.contentView.addSubview(selectedRow)
+        selectedTextStack.translatesAutoresizingMaskIntoConstraints = false
+        selectedStoreCard.contentView.addSubview(selectedTextStack)
         let cardTap = UITapGestureRecognizer(target: self, action: #selector(handleSelectedStoreCardTap))
         selectedStoreCard.contentView.addGestureRecognizer(cardTap)
         selectedStoreCard.contentView.isUserInteractionEnabled = true
@@ -285,10 +279,27 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
         sheetTitleLabel.font = .preferredFont(forTextStyle: .title2).withWeight(.bold)
         sheetTitleLabel.text = "Participating Stores"
         sheetTitleLabel.numberOfLines = 1
+        sheetTitleLabel.textAlignment = .center
+        sheetTitleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        sheetTitleLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        sheetTitleLabel.setContentHuggingPriority(.required, for: .vertical)
 
         sheetCountLabel.font = .preferredFont(forTextStyle: .footnote)
         sheetCountLabel.textColor = .secondaryLabel
         sheetCountLabel.numberOfLines = 0
+        sheetCountLabel.textAlignment = .center
+        sheetCountLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        sheetCountLabel.setContentHuggingPriority(.required, for: .vertical)
+
+        sheetCountSeparatorLabel.font = .preferredFont(forTextStyle: .footnote)
+        sheetCountSeparatorLabel.textColor = .secondaryLabel
+        sheetCountSeparatorLabel.text = "•"
+        sheetCountSeparatorLabel.isHidden = true
+
+        sheetCountSpinner.color = .secondaryLabel
+        sheetCountSpinner.hidesWhenStopped = true
+        sheetCountSpinner.transform = CGAffineTransform(scaleX: 0.72, y: 0.72)
+        sheetCountSpinner.isHidden = true
 
         searchBar.placeholder = "Search stores, cities, countries"
         searchBar.searchBarStyle = .minimal
@@ -304,16 +315,23 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
         tableView.keyboardDismissMode = .onDrag
         tableView.contentInset.bottom = 24
 
-        let titleTextStack = UIStackView(arrangedSubviews: [sheetTitleLabel, sheetCountLabel])
+        let countRow = UIStackView(arrangedSubviews: [sheetCountLabel, sheetCountSeparatorLabel, sheetCountSpinner])
+        countRow.axis = .horizontal
+        countRow.spacing = 5
+        countRow.alignment = .center
+        countRow.distribution = .fill
+
+        let titleTextStack = UIStackView(arrangedSubviews: [sheetTitleLabel, countRow])
         titleTextStack.axis = .vertical
         titleTextStack.spacing = 2
-        titleTextStack.alignment = .leading
+        titleTextStack.alignment = .center
 
-        let titleRow = UIStackView(arrangedSubviews: [titleTextStack, UIView()])
+        let titleRow = UIStackView(arrangedSubviews: [titleTextStack])
         titleRow.axis = .horizontal
         titleRow.alignment = .top
         titleRow.isLayoutMarginsRelativeArrangement = true
         titleRow.layoutMargins = UIEdgeInsets(top: 4, left: 0, bottom: 4, right: 0)
+        titleRow.translatesAutoresizingMaskIntoConstraints = false
 
         let headerStack = UIStackView(arrangedSubviews: [grabberView, titleRow])
         headerStack.axis = .vertical
@@ -341,17 +359,17 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
             mapView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 
-            selectedStoreCard.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 28),
+            selectedStoreCard.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
             selectedStoreCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             selectedStoreCard.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -16),
 
             mapControlsView.topAnchor.constraint(equalTo: selectedStoreCard.topAnchor),
             mapControlsView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
 
-            selectedRow.topAnchor.constraint(equalTo: selectedStoreCard.contentView.topAnchor, constant: 12),
-            selectedRow.leadingAnchor.constraint(equalTo: selectedStoreCard.contentView.leadingAnchor, constant: 12),
-            selectedRow.trailingAnchor.constraint(equalTo: selectedStoreCard.contentView.trailingAnchor, constant: -12),
-            selectedRow.bottomAnchor.constraint(equalTo: selectedStoreCard.contentView.bottomAnchor, constant: -12),
+            selectedTextStack.topAnchor.constraint(equalTo: selectedStoreCard.contentView.topAnchor, constant: 12),
+            selectedTextStack.leadingAnchor.constraint(equalTo: selectedStoreCard.contentView.leadingAnchor, constant: 12),
+            selectedTextStack.trailingAnchor.constraint(equalTo: selectedStoreCard.contentView.trailingAnchor, constant: -12),
+            selectedTextStack.bottomAnchor.constraint(equalTo: selectedStoreCard.contentView.bottomAnchor, constant: -12),
 
             controlsStack.topAnchor.constraint(equalTo: mapControlsView.contentView.topAnchor, constant: 10),
             controlsStack.leadingAnchor.constraint(equalTo: mapControlsView.contentView.leadingAnchor, constant: 10),
@@ -360,10 +378,11 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
 
             sheetView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             sheetView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
-            sheetView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 8),
+            sheetView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -8),
 
             grabberView.heightAnchor.constraint(equalToConstant: 6),
             grabberView.widthAnchor.constraint(equalToConstant: 48),
+            titleRow.widthAnchor.constraint(equalTo: sheetView.contentView.widthAnchor, constant: -24),
 
             sheetStack.topAnchor.constraint(equalTo: sheetView.contentView.topAnchor, constant: 10),
             sheetStack.leadingAnchor.constraint(equalTo: sheetView.contentView.leadingAnchor, constant: 12),
@@ -418,7 +437,7 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(systemName: systemName), for: .normal)
         button.tintColor = .label
-        button.backgroundColor = .secondarySystemBackground.withAlphaComponent(0.7)
+        button.backgroundColor = UIColor.secondarySystemBackground.withAlphaComponent(0.74)
         button.layer.cornerRadius = 20
         button.clipsToBounds = true
         button.addTarget(self, action: action, for: .touchUpInside)
@@ -573,6 +592,25 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
 
     private func updateMapType(_ mapType: MKMapType, persist: Bool = true) {
         mapView.mapType = mapType
+        if #available(iOS 16.0, *) {
+            let configuration: MKMapConfiguration
+            switch mapType {
+            case .standard, .mutedStandard:
+                let emphasis: MKStandardMapConfiguration.EmphasisStyle = mapType == .mutedStandard ? .muted : .default
+                let standardConfiguration = MKStandardMapConfiguration(elevationStyle: .realistic, emphasisStyle: emphasis)
+                standardConfiguration.showsTraffic = false
+                configuration = standardConfiguration
+            case .hybrid:
+                configuration = MKHybridMapConfiguration()
+            case .satellite:
+                configuration = MKImageryMapConfiguration()
+            default:
+                let standardConfiguration = MKStandardMapConfiguration(elevationStyle: .realistic, emphasisStyle: .default)
+                standardConfiguration.showsTraffic = false
+                configuration = standardConfiguration
+            }
+            mapView.preferredConfiguration = configuration
+        }
         mapTypeButton.setImage(UIImage(systemName: mapTypeSymbolName(for: mapType)), for: .normal)
         if persist {
             defaults.set(Int(mapType.rawValue), forKey: StorageKey.mapType)
@@ -601,6 +639,14 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
 
     private func updateCountLabel() {
         sheetCountLabel.text = "\(onMapStores.count) stores on map"
+        let isResolving = pendingGeocodeStoreIDs.isEmpty == false || geocodeTask != nil
+        sheetCountSeparatorLabel.isHidden = !isResolving
+        sheetCountSpinner.isHidden = !isResolving
+        if isResolving {
+            sheetCountSpinner.startAnimating()
+        } else {
+            sheetCountSpinner.stopAnimating()
+        }
     }
 
     private func updateSelectedStoreCard(with store: ParticipatingStoreRecord?) {
@@ -659,6 +705,7 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
     private func configureMarkerAppearance(for view: MKMarkerAnnotationView, store: ParticipatingStoreRecord) {
         let isSelected = SelectedStoreStore.shared.selectedStore?.id == store.id
         view.markerTintColor = isSelected ? .systemGreen : .systemRed
+        view.glyphTintColor = .white
         view.glyphImage = UIImage(systemName: isSelected ? "star.fill" : "opticaldisc.fill")
         view.transform = isSelected ? CGAffineTransform(scaleX: 1.18, y: 1.18) : .identity
         view.displayPriority = isSelected ? .required : .defaultHigh
@@ -757,6 +804,8 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
             pendingGeocodeStoreIDs.insert(store.id)
         }
 
+        updateCountLabel()
+
         guard geocodeTask == nil else { return }
         geocodeTask = Task { [weak self] in
             await self?.processGeocodeQueue()
@@ -782,7 +831,12 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
 
     private func processGeocodeQueue() async {
         while let storeID = pendingGeocodeStoreIDs.first {
-            defer { pendingGeocodeStoreIDs.remove(storeID) }
+            defer {
+                pendingGeocodeStoreIDs.remove(storeID)
+                Task { @MainActor in
+                    self.updateCountLabel()
+                }
+            }
 
             guard let store = allStores.first(where: { $0.id == storeID }) else {
                 continue
@@ -809,6 +863,9 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
         }
 
         geocodeTask = nil
+        await MainActor.run {
+            updateCountLabel()
+        }
         if pendingGeocodeStoreIDs.isEmpty == false {
             geocodeTask = Task { [weak self] in
                 await self?.processGeocodeQueue()

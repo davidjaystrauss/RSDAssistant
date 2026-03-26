@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
-    <device id="retina4_7" orientation="portrait" appearance="light"/>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24765" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+    <device id="retina6_3" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15509"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24743"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -15,28 +16,19 @@
                         <viewControllerLayoutGuide type="bottom" id="xb3-aO-Qok"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="402" height="874"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="iconLarge" translatesAutoresizingMaskIntoConstraints="NO" id="wB9-rW-gPj">
-                                <rect key="frame" x="75" y="221" width="225" height="225"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" secondItem="wB9-rW-gPj" secondAttribute="height" multiplier="1:1" id="4Mz-BF-zd9"/>
-                                </constraints>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="RSD-record-only" translatesAutoresizingMaskIntoConstraints="NO" id="372-Ch-GJo">
+                                <rect key="frame" x="51" y="287" width="300" height="300"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="tintColor" systemColor="systemOrangeColor"/>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Record Store Day Assistant" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="myG-6o-NTz">
-                                <rect key="frame" x="55" y="454" width="265" height="29"/>
-                                <fontDescription key="fontDescription" type="system" weight="thin" pointSize="24"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="myG-6o-NTz" firstAttribute="top" secondItem="wB9-rW-gPj" secondAttribute="bottom" constant="8" id="Wi5-lG-3nS"/>
-                            <constraint firstItem="myG-6o-NTz" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="Xry-3p-urg"/>
-                            <constraint firstItem="wB9-rW-gPj" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="Zqs-tp-5n6"/>
-                            <constraint firstItem="wB9-rW-gPj" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="ezg-vv-TAC"/>
-                            <constraint firstItem="wB9-rW-gPj" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.6" id="qa8-AL-1r8"/>
+                            <constraint firstItem="372-Ch-GJo" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="iJM-zu-Vew"/>
+                            <constraint firstItem="372-Ch-GJo" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="yKB-gP-ed7"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -46,6 +38,12 @@
         </scene>
     </scenes>
     <resources>
-        <image name="iconLarge" width="512" height="512"/>
+        <image name="RSD-record-only" width="300" height="300"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemOrangeColor">
+            <color red="1" green="0.55294117649999996" blue="0.15686274510000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
     </resources>
 </document>

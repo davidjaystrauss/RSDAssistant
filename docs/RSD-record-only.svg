@@ -1,0 +1,15 @@
+<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="recordTone" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(142 82) rotate(56.6) scale(115)">
+      <stop offset="0" stop-color="#B5BAC4"/>
+      <stop offset="0.5" stop-color="#6D7380"/>
+      <stop offset="1" stop-color="#2B2F38"/>
+    </radialGradient>
+  </defs>
+  <circle cx="150" cy="150" r="93" fill="url(#recordTone)"/>
+  <circle cx="150" cy="150" r="72.5" stroke="#E7EBF2" stroke-opacity="0.58" stroke-width="2.5"/>
+  <circle cx="150" cy="150" r="55.5" stroke="#F4F7FB" stroke-opacity="0.2" stroke-width="1.7"/>
+  <circle cx="150" cy="150" r="33.5" fill="#9FA5B1" fill-opacity="0.72"/>
+  <circle cx="150" cy="150" r="8.4" fill="#FBFCFE" fill-opacity="0.9"/>
+  <circle cx="150" cy="150" r="2.5" fill="#3C414B"/>
+</svg>

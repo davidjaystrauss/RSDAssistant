@@ -31,7 +31,7 @@ class RSDTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         
-        imageAlbum.image = UIImage(named: "filler")
+        imageAlbum.image = RSDPlaceholderArt.image(size: 160, userInterfaceStyle: traitCollection.userInterfaceStyle)
         labelArtist.text = ""
         labelAlbum.text = ""
         labelFormat.text = ""

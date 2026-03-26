@@ -287,7 +287,7 @@ final class RSDAppState: ObservableObject {
     @Published var selectedList: RSDListDefinition
     @Published var sortOption: RSDSortOption = .artist
     @Published var isSortReversed: Bool = false
-    @Published var viewMode: RSDViewMode = .list
+    @Published var viewMode: RSDViewMode = .grid
     @Published var favoritesViewMode: RSDViewMode = .list
     @Published var presentedSheet: RSDPresentedSheet?
     @Published var formatFilter: String = "All Formats"
@@ -308,7 +308,7 @@ final class RSDAppState: ObservableObject {
     }
 
     private init() {
-        let fallbackList = Self.availableLists.first ?? RSDListDefinition(slug: "empty", title: "Empty", subtitle: "", resourceName: "")
+        let fallbackList = Self.defaultInitialList()
         if let savedSlug = defaults.string(forKey: StorageKey.selectedListSlug),
            let savedList = Self.availableLists.first(where: { $0.slug == savedSlug }) {
             selectedList = savedList
@@ -386,6 +386,34 @@ final class RSDAppState: ObservableObject {
                 self?.defaults.set(value, forKey: StorageKey.quantityFilter)
             }
             .store(in: &cancellables)
+    }
+
+    private static func defaultInitialList() -> RSDListDefinition {
+        let fallback = availableLists.first(where: { $0.slug == "rsd-2026-canada" })
+            ?? availableLists.first
+            ?? RSDListDefinition(slug: "empty", title: "Empty", subtitle: "", resourceName: "")
+
+        let regionCode = Locale.current.region?.identifier.uppercased()
+            ?? Locale.current.regionCode?.uppercased()
+            ?? ""
+
+        let preferredSlug: String
+        switch regionCode {
+        case "US":
+            preferredSlug = "rsd-2026-us"
+        case "CA":
+            preferredSlug = "rsd-2026-canada"
+        case "AU":
+            preferredSlug = "rsd-2026-australia"
+        case "DE":
+            preferredSlug = "rsd-2026-germany"
+        case "GB", "UK":
+            preferredSlug = "rsd-2026-uk"
+        default:
+            preferredSlug = "rsd-2026-canada"
+        }
+
+        return availableLists.first(where: { $0.slug == preferredSlug }) ?? fallback
     }
 }
 
@@ -544,6 +572,29 @@ final class ArtworkPipeline {
         imageCache.totalCostLimit = 32 * 1024 * 1024
     }
 
+    enum LoadPriority {
+        case normal
+        case high
+
+        var taskPriority: TaskPriority {
+            switch self {
+            case .normal:
+                return .utility
+            case .high:
+                return .userInitiated
+            }
+        }
+
+        var urlSessionPriority: Float {
+            switch self {
+            case .normal:
+                return URLSessionTask.defaultPriority
+            case .high:
+                return URLSessionTask.highPriority
+            }
+        }
+    }
+
     func cachedImage(for url: URL) -> UIImage? {
         let cacheKey = url as NSURL
         if let image = imageCache.object(forKey: cacheKey) {
@@ -560,13 +611,13 @@ final class ArtworkPipeline {
         return image
     }
 
-    func loadImage(from url: URL) async throws -> UIImage? {
+    func loadImage(from url: URL, priority: LoadPriority = .normal) async throws -> UIImage? {
         if let cached = cachedImage(for: url) {
             return cached
         }
 
         let request = URLRequest(url: url)
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await data(for: request, priority: priority)
 
         guard let httpResponse = response as? HTTPURLResponse,
               (200..<300).contains(httpResponse.statusCode),
@@ -578,6 +629,33 @@ final class ArtworkPipeline {
         urlCache.storeCachedResponse(cachedResponse, for: request)
         store(image, for: url)
         return image
+    }
+
+    private func data(for request: URLRequest, priority: LoadPriority) async throws -> (Data, URLResponse) {
+        let taskBox = LockedTaskBox()
+
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { continuation in
+                let dataTask = session.dataTask(with: request) { data, response, error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                        return
+                    }
+
+                    guard let data, let response else {
+                        continuation.resume(throwing: URLError(.badServerResponse))
+                        return
+                    }
+
+                    continuation.resume(returning: (data, response))
+                }
+                dataTask.priority = priority.urlSessionPriority
+                taskBox.task = dataTask
+                dataTask.resume()
+            }
+        } onCancel: {
+            taskBox.task?.cancel()
+        }
     }
 
     private func store(_ image: UIImage, for url: URL) {
@@ -608,16 +686,36 @@ final class ArtworkPipeline {
     }
 }
 
+private final class LockedTaskBox: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storedTask: URLSessionTask?
+
+    var task: URLSessionTask? {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return storedTask
+        }
+        set {
+            lock.lock()
+            storedTask = newValue
+            lock.unlock()
+        }
+    }
+}
+
 @MainActor
 final class ArtworkLoader: ObservableObject {
     @Published private(set) var image: UIImage?
     @Published private(set) var isLoading = false
 
     private let urlString: String
+    private let priority: ArtworkPipeline.LoadPriority
     private var loadTask: Task<Void, Never>?
 
-    init(urlString: String) {
+    init(urlString: String, priority: ArtworkPipeline.LoadPriority = .normal) {
         self.urlString = urlString
+        self.priority = priority
     }
 
     func loadIfNeeded() {
@@ -631,7 +729,7 @@ final class ArtworkLoader: ObservableObject {
         }
 
         isLoading = true
-        loadTask = Task { [url] in
+        loadTask = Task(priority: priority.taskPriority) { [url, priority] in
             defer {
                 Task { @MainActor in
                     self.isLoading = false
@@ -639,7 +737,7 @@ final class ArtworkLoader: ObservableObject {
                 }
             }
 
-            let loadedImage = try? await ArtworkPipeline.shared.loadImage(from: url)
+            let loadedImage = try? await ArtworkPipeline.shared.loadImage(from: url, priority: priority)
             guard Task.isCancelled == false else {
                 return
             }
@@ -657,15 +755,169 @@ final class ArtworkLoader: ObservableObject {
     }
 }
 
+enum RSDPlaceholderArt {
+    static func image(size: CGFloat = 240, userInterfaceStyle: UIUserInterfaceStyle = .unspecified) -> UIImage {
+        let resolvedTraits = UITraitCollection(userInterfaceStyle: userInterfaceStyle)
+        let colorScheme: ColorScheme = userInterfaceStyle == .dark ? .dark : .light
+        let palette = RSDAppState.shared.selectedList.theme.palette(for: colorScheme)
+        let backgroundTopColor = UIColor(palette.backgroundTop)
+        let backgroundBottomColor = UIColor(palette.backgroundBottom)
+        let backgroundColor = UIColor.secondarySystemBackground.resolvedColor(with: resolvedTraits)
+        let ringColor = UIColor.white.withAlphaComponent(userInterfaceStyle == .dark ? 0.62 : 0.58)
+        let innerRingColor = UIColor.white.withAlphaComponent(userInterfaceStyle == .dark ? 0.18 : 0.16)
+        let recordGradientColors = userInterfaceStyle == .dark
+            ? [UIColor(white: 0.72, alpha: 1).cgColor, UIColor(white: 0.42, alpha: 1).cgColor, UIColor(white: 0.16, alpha: 1).cgColor]
+            : [UIColor(white: 0.78, alpha: 1).cgColor, UIColor(white: 0.50, alpha: 1).cgColor, UIColor(white: 0.28, alpha: 1).cgColor]
+
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = UIScreen.main.scale
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: size, height: size), format: format)
+
+        return renderer.image { context in
+            let cgContext = context.cgContext
+            let bounds = CGRect(origin: .zero, size: CGSize(width: size, height: size))
+            let cornerRadius = size * 0.12
+
+            let panelPath = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
+            cgContext.saveGState()
+            panelPath.addClip()
+            let panelGradient = CGGradient(
+                colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                colors: [
+                    backgroundTopColor.withAlphaComponent(userInterfaceStyle == .dark ? 0.92 : 0.98).cgColor,
+                    backgroundBottomColor.withAlphaComponent(userInterfaceStyle == .dark ? 0.96 : 0.98).cgColor,
+                ] as CFArray,
+                locations: [0.0, 1.0]
+            )!
+            cgContext.drawLinearGradient(
+                panelGradient,
+                start: CGPoint(x: bounds.midX, y: bounds.minY),
+                end: CGPoint(x: bounds.midX, y: bounds.maxY),
+                options: []
+            )
+            cgContext.restoreGState()
+
+            backgroundColor.withAlphaComponent(userInterfaceStyle == .dark ? 0.18 : 0.1).setStroke()
+            panelPath.lineWidth = 1
+            panelPath.stroke()
+
+            let recordCenter = CGPoint(x: size * 0.5, y: size * 0.5)
+            let recordRadius = size * 0.39
+            let colorSpace = CGColorSpaceCreateDeviceRGB()
+            let recordGradient = CGGradient(colorsSpace: colorSpace, colors: recordGradientColors as CFArray, locations: [0.0, 0.52, 1.0])!
+            cgContext.saveGState()
+            UIBezierPath(arcCenter: recordCenter, radius: recordRadius, startAngle: 0, endAngle: .pi * 2, clockwise: true).addClip()
+            cgContext.drawRadialGradient(
+                recordGradient,
+                startCenter: CGPoint(x: recordCenter.x - size * 0.035, y: recordCenter.y - size * 0.08),
+                startRadius: 0,
+                endCenter: recordCenter,
+                endRadius: recordRadius,
+                options: []
+            )
+            cgContext.restoreGState()
+
+            ringColor.setStroke()
+            for radius in [recordRadius * 0.78, recordRadius * 0.6] {
+                let path = UIBezierPath(arcCenter: recordCenter, radius: radius, startAngle: 0, endAngle: .pi * 2, clockwise: true)
+                path.lineWidth = size * 0.014
+                path.stroke()
+            }
+
+            innerRingColor.setStroke()
+            let innerGroove = UIBezierPath(arcCenter: recordCenter, radius: recordRadius * 0.45, startAngle: 0, endAngle: .pi * 2, clockwise: true)
+            innerGroove.lineWidth = size * 0.01
+            innerGroove.stroke()
+
+            UIColor(white: 0.76, alpha: 0.74).setFill()
+            UIBezierPath(arcCenter: recordCenter, radius: recordRadius * 0.36, startAngle: 0, endAngle: .pi * 2, clockwise: true).fill()
+            UIColor.white.withAlphaComponent(userInterfaceStyle == .dark ? 0.94 : 0.9).setFill()
+            UIBezierPath(arcCenter: recordCenter, radius: recordRadius * 0.085, startAngle: 0, endAngle: .pi * 2, clockwise: true).fill()
+            UIColor(white: 0.25, alpha: 1).setFill()
+            UIBezierPath(arcCenter: recordCenter, radius: recordRadius * 0.028, startAngle: 0, endAngle: .pi * 2, clockwise: true).fill()
+        }
+    }
+}
+
+struct RSDRecordToteMark: View {
+    let animated: Bool
+    @ObservedObject private var appState = RSDAppState.shared
+    @Environment(\.colorScheme) private var colorScheme
+    @State private var loaderScale: CGFloat = 0.96
+    @State private var loaderOpacity: Double = 0.82
+
+    private var theme: RSDThemePalette {
+        appState.selectedList.theme.palette(for: colorScheme)
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            let size = min(geometry.size.width, geometry.size.height)
+            let recordFill = RadialGradient(
+                colors: [
+                    SwiftUI.Color(white: colorScheme == .dark ? 0.74 : 0.8),
+                    SwiftUI.Color(white: colorScheme == .dark ? 0.42 : 0.5),
+                    SwiftUI.Color(white: colorScheme == .dark ? 0.16 : 0.28),
+                ],
+                center: .init(x: 0.46, y: 0.34),
+                startRadius: 0,
+                endRadius: size * 0.42
+            )
+
+            ZStack {
+                RoundedRectangle(cornerRadius: size * 0.12, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                theme.backgroundTop.opacity(colorScheme == .dark ? 0.94 : 0.98),
+                                theme.backgroundBottom.opacity(colorScheme == .dark ? 0.98 : 0.98),
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+
+                RoundedRectangle(cornerRadius: size * 0.12, style: .continuous)
+                    .stroke(SwiftUI.Color.primary.opacity(colorScheme == .dark ? 0.16 : 0.08), lineWidth: 1)
+
+                Circle()
+                    .fill(recordFill)
+                    .frame(width: size * 0.78, height: size * 0.78)
+                    .overlay {
+                        Circle().stroke(SwiftUI.Color.white.opacity(0.58), lineWidth: size * 0.014).padding(size * 0.085)
+                        Circle().stroke(SwiftUI.Color.white.opacity(0.18), lineWidth: size * 0.01).padding(size * 0.145)
+                        Circle().fill(SwiftUI.Color(white: 0.68).opacity(0.74)).frame(width: size * 0.22, height: size * 0.22)
+                        Circle().fill(SwiftUI.Color.white.opacity(0.9)).frame(width: size * 0.058, height: size * 0.058)
+                        Circle().fill(SwiftUI.Color(white: 0.24)).frame(width: size * 0.016, height: size * 0.016)
+                    }
+                    .scaleEffect(animated ? loaderScale : 1)
+                    .opacity(animated ? loaderOpacity : 1)
+            }
+            .onAppear {
+                guard animated else { return }
+                withAnimation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true)) {
+                    loaderScale = 1
+                    loaderOpacity = 1
+                }
+            }
+        }
+        .aspectRatio(1, contentMode: .fit)
+    }
+}
+
 struct RemoteArtworkView: View {
     let urlString: String
     let contentMode: SwiftUI.ContentMode
     @StateObject private var loader: ArtworkLoader
 
-    init(urlString: String, contentMode: SwiftUI.ContentMode = .fill) {
+    init(
+        urlString: String,
+        contentMode: SwiftUI.ContentMode = .fill,
+        priority: ArtworkPipeline.LoadPriority = .normal
+    ) {
         self.urlString = urlString
         self.contentMode = contentMode
-        _loader = StateObject(wrappedValue: ArtworkLoader(urlString: urlString))
+        _loader = StateObject(wrappedValue: ArtworkLoader(urlString: urlString, priority: priority))
     }
 
     var body: some View {
@@ -676,13 +928,7 @@ struct RemoteArtworkView: View {
         } else if urlString.isEmpty {
             placeholder
         } else {
-            placeholder
-                .overlay {
-                    if loader.isLoading {
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle())
-                    }
-                }
+            placeholder(animated: loader.isLoading)
                 .task {
                     loader.loadIfNeeded()
                 }
@@ -693,26 +939,26 @@ struct RemoteArtworkView: View {
     }
 
     private var placeholder: some View {
-        SwiftUI.Rectangle()
-            .fill(SwiftUI.Color(.secondarySystemBackground))
-            .overlay(
-                SwiftUI.Image(systemName: "opticaldisc")
-                    .font(.system(size: 28, weight: .medium))
-                    .foregroundColor(SwiftUI.Color.secondary)
-            )
+        placeholder(animated: false)
+    }
+
+    private func placeholder(animated: Bool) -> some View {
+        RSDRecordToteMark(animated: animated)
     }
 }
 
 struct ReleaseRowView: View {
     let listing: Listing
     let isFavorite: Bool
+    let themeTint: SwiftUI.Color
     let onFavoriteToggle: () -> Void
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         HStack(spacing: 14) {
             RemoteArtworkView(urlString: listing.photoURL)
                 .frame(width: 68, height: 68)
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(listing.album)
@@ -739,13 +985,24 @@ struct ReleaseRowView: View {
             .buttonStyle(BorderlessButtonStyle())
             .padding(.trailing, 18)
         }
-        .padding(.vertical, 6)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .fill(themeTint.opacity(colorScheme == .dark ? 0.16 : 0.08))
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(themeTint.opacity(colorScheme == .dark ? 0.28 : 0.16), lineWidth: 1)
+        }
     }
 }
 
 struct ReleaseGridCardView: View {
     let listing: Listing
     let isFavorite: Bool
+    let themeTint: SwiftUI.Color
     let onFavoriteToggle: () -> Void
 
     var body: some View {
@@ -753,7 +1010,7 @@ struct ReleaseGridCardView: View {
             RemoteArtworkView(urlString: listing.photoURL, contentMode: .fit)
                 .frame(width: artworkSize, height: artworkSize)
                 .frame(maxWidth: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
 
             HStack(alignment: .top, spacing: 8) {
                 VStack(alignment: .leading, spacing: 4) {
@@ -795,45 +1052,51 @@ struct ReleaseGridCardView: View {
 struct CoverFlowCardView: View {
     let listing: Listing
     let isFavorite: Bool
+    let themeTint: SwiftUI.Color
+    let cardWidth: CGFloat
+    let showsMetadata: Bool
+    let prefersCompactArtwork: Bool
     let onTap: () -> Void
     let onFavoriteToggle: () -> Void
     let normalizedDistanceFromCenter: CGFloat
 
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: prefersCompactArtwork ? 10 : 14) {
             SwiftUI.Button(action: onTap) {
                 RemoteArtworkView(urlString: listing.photoURL, contentMode: .fit)
-                    .frame(width: 230, height: 230)
+                    .frame(width: artworkDimension, height: artworkDimension)
                     .background(SwiftUI.Color(.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
             }
             .buttonStyle(.plain)
-                .frame(width: 230, height: 230)
+                .frame(width: artworkDimension, height: artworkDimension)
 
-            VStack(spacing: 8) {
-                VStack(spacing: 4) {
-                    Text(listing.album)
-                        .font(.headline)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                    Text(listing.artist)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                    Text(listing.format)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+            if showsMetadata {
+                VStack(spacing: 8) {
+                    VStack(spacing: 4) {
+                        Text(listing.album)
+                            .font(.headline)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                        Text(listing.artist)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                        Text(listing.format)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
 
-                SwiftUI.Button(action: onFavoriteToggle) {
-                    SwiftUI.Image(systemName: isFavorite ? "heart.fill" : "heart")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(isFavorite ? .red : .secondary)
+                    SwiftUI.Button(action: onFavoriteToggle) {
+                        SwiftUI.Image(systemName: isFavorite ? "heart.fill" : "heart")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(isFavorite ? .red : .secondary)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
+                .frame(width: cardWidth)
             }
-            .frame(width: 240)
         }
         .scaleEffect(coverFlowScale)
         .rotation3DEffect(
@@ -853,6 +1116,24 @@ struct CoverFlowCardView: View {
     private var coverFlowHorizontalOffset: CGFloat {
         -normalizedDistanceFromCenter * 40
     }
+
+    private var artworkDimension: CGFloat {
+        let scale: CGFloat = prefersCompactArtwork ? 0.78 : 1
+        return min(cardWidth * scale, prefersCompactArtwork ? 280 : 360)
+    }
+}
+
+private struct CoverFlowSearchModifier: ViewModifier {
+    let isEnabled: Bool
+    @Binding var text: String
+
+    func body(content: Content) -> some View {
+        if isEnabled {
+            content.searchable(text: $text, prompt: "Search releases")
+        } else {
+            content
+        }
+    }
 }
 
 struct RSDRootView: View {
@@ -870,39 +1151,23 @@ struct RSDRootView: View {
     }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            NavigationStack {
-                ZStack {
-                    LinearGradient(
-                        colors: [theme.backgroundTop, theme.backgroundBottom],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    .ignoresSafeArea()
+        GeometryReader { geometry in
+            let isLandscape = geometry.size.width > geometry.size.height
+            let isImmersiveCoverFlow = appState.viewMode == .coverFlow && geometry.size.width > geometry.size.height
 
-                    rootContent
-                }
-                .navigationTitle("")
-                .navigationBarTitleDisplayMode(.inline)
-                .safeAreaInset(edge: .top, spacing: 0) {
-                    filterBar
-                }
-                .toolbar(content: toolbarContent)
-                .toolbarBackground(theme.navigationBar.opacity(colorScheme == .dark ? 0.92 : 0.98), for: .navigationBar)
-                .toolbarBackground(.visible, for: .navigationBar)
-                .tint(theme.tint)
-                .accentColor(theme.tint)
-            }
-            .tabItem {
-                Label("Releases", systemImage: "music.note.list")
-            }
-            .tag(RSDMainTab.releases)
-
-            StoresMapScreen(showsDoneButton: false)
+            TabView(selection: $selectedTab) {
+                releasesTab(isImmersiveCoverFlow: isImmersiveCoverFlow, isLandscape: isLandscape)
                 .tabItem {
-                    Label("Stores", systemImage: "map")
+                    Label("Releases", systemImage: "music.note.list")
                 }
-                .tag(RSDMainTab.stores)
+                .tag(RSDMainTab.releases)
+
+                StoresMapScreen(showsDoneButton: false)
+                    .tabItem {
+                        Label("Stores", systemImage: "map")
+                    }
+                    .tag(RSDMainTab.stores)
+            }
         }
         .tint(theme.tint)
         .sheet(item: $appState.presentedSheet) { sheet in
@@ -923,8 +1188,56 @@ struct RSDRootView: View {
         }
     }
 
+    private func releasesTab(isImmersiveCoverFlow: Bool, isLandscape: Bool) -> some View {
+        Group {
+            if isImmersiveCoverFlow {
+                NavigationStack {
+                    ZStack {
+                        LinearGradient(
+                            colors: [theme.backgroundTop, theme.backgroundBottom],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .ignoresSafeArea()
+
+                        rootContent(isImmersiveCoverFlow: true, isLandscape: isLandscape)
+                    }
+                    .navigationTitle("")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar(.hidden, for: .navigationBar)
+                    .toolbar(.hidden, for: .tabBar)
+                    .tint(theme.tint)
+                    .accentColor(theme.tint)
+                }
+            } else {
+                NavigationStack {
+                    ZStack {
+                        LinearGradient(
+                            colors: [theme.backgroundTop, theme.backgroundBottom],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .ignoresSafeArea()
+
+                        rootContent(isImmersiveCoverFlow: false, isLandscape: isLandscape)
+                    }
+                    .navigationTitle("")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .safeAreaInset(edge: .top, spacing: 0) {
+                        filterBar
+                    }
+                    .toolbar(content: toolbarContent)
+                    .toolbarBackground(theme.navigationBar.opacity(colorScheme == .dark ? 0.92 : 0.98), for: .navigationBar)
+                    .toolbarBackground(.visible, for: .navigationBar)
+                    .tint(theme.tint)
+                    .accentColor(theme.tint)
+                }
+            }
+        }
+    }
+
     @ViewBuilder
-    private var rootContent: some View {
+    private func rootContent(isImmersiveCoverFlow: Bool, isLandscape: Bool) -> some View {
         if let error = library.loadError {
             SwiftUI.VStack(spacing: 16) {
                 SwiftUI.Text("Unable to Load List")
@@ -936,7 +1249,7 @@ struct RSDRootView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            contentView
+            contentView(isImmersiveCoverFlow: isImmersiveCoverFlow, isLandscape: isLandscape)
         }
     }
 
@@ -1009,6 +1322,9 @@ struct RSDRootView: View {
             NavigationStack {
                 FavoritesView(list: appState.selectedList, showsDoneButton: true)
             }
+#if targetEnvironment(macCatalyst)
+            .frame(minWidth: 760, idealWidth: 980, maxWidth: .infinity, minHeight: 620, idealHeight: 760, maxHeight: .infinity)
+#endif
             .tint(theme.tint)
             .accentColor(theme.tint)
         case .stores:
@@ -1063,7 +1379,7 @@ struct RSDRootView: View {
         searchText = ""
     }
 
-    private var contentView: some View {
+    private func contentView(isImmersiveCoverFlow: Bool, isLandscape: Bool) -> some View {
         SwiftUI.Group {
             switch appState.viewMode {
             case .list:
@@ -1077,11 +1393,14 @@ struct RSDRootView: View {
                                             ReleaseRowView(
                                                 listing: listing,
                                                 isFavorite: favoritesStore.contains(listing, in: appState.selectedList),
+                                                themeTint: theme.tint,
                                                 onFavoriteToggle: {
                                                     favoritesStore.toggle(listing, in: appState.selectedList)
                                                 }
                                             )
                                         }
+                                        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                                        .listRowBackground(SwiftUI.Color.clear)
                                     }
                                 }
                                 .id(section.id)
@@ -1091,7 +1410,7 @@ struct RSDRootView: View {
                         .scrollContentBackground(.hidden)
                         .searchable(text: $searchText, prompt: "Search releases")
 
-                        if sectionedReleases.count > 1 {
+                        if sectionedReleases.count > 1 && isLandscape == false {
                             sectionIndexSidebar { sectionID in
                                 activeSectionID = sectionID
                                 withAnimation(.easeInOut(duration: 0.12)) {
@@ -1103,16 +1422,20 @@ struct RSDRootView: View {
                 }
 
             case .grid:
+                let landscapeColumnSpacing = isLandscape ? gridColumnSpacing + 6 : gridColumnSpacing
+                let landscapeRowSpacing = isLandscape ? gridRowSpacing + 6 : gridRowSpacing
+                let landscapeContentPadding = isLandscape ? max(gridContentPadding - 4, 10) : gridContentPadding
                 ScrollView {
                     LazyVGrid(
-                        columns: [GridItem(.adaptive(minimum: gridMinimumWidth), spacing: gridColumnSpacing)],
-                        spacing: gridRowSpacing
+                        columns: [GridItem(.adaptive(minimum: gridMinimumWidth), spacing: landscapeColumnSpacing)],
+                        spacing: landscapeRowSpacing
                     ) {
                         ForEach(filteredAndSortedReleases) { listing in
                             releaseNavigation(for: listing) {
                                 ReleaseGridCardView(
                                     listing: listing,
                                     isFavorite: favoritesStore.contains(listing, in: appState.selectedList),
+                                    themeTint: theme.tint,
                                     onFavoriteToggle: {
                                         favoritesStore.toggle(listing, in: appState.selectedList)
                                     }
@@ -1121,14 +1444,35 @@ struct RSDRootView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    .padding(gridContentPadding)
+                    .padding(landscapeContentPadding)
                 }
+                .background(
+                    LinearGradient(
+                        colors: [
+                            theme.backgroundTop.opacity(colorScheme == .dark ? 0.34 : 0.2),
+                            theme.backgroundBottom.opacity(colorScheme == .dark ? 0.24 : 0.12),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .ignoresSafeArea()
+                )
                 .searchable(text: $searchText, prompt: "Search releases")
 
             case .coverFlow:
                 GeometryReader { outerGeometry in
-                    let cardWidth: CGFloat = 240
-                    let overlapSpacing: CGFloat = -32
+                    let availableWidth = outerGeometry.size.width
+                    let containerHeight = outerGeometry.size.height
+                    let cardWidth = isImmersiveCoverFlow
+                        ? min(max(min(availableWidth * 0.42, containerHeight * 0.52), 220), 320)
+                        : min(max(availableWidth * 0.62, 240), 420)
+                    let overlapSpacing = -cardWidth * 0.14
+                    let itemHeight = isImmersiveCoverFlow
+                        ? min(max(cardWidth + 118, 330), max(containerHeight - 32, 280))
+                        : max(cardWidth + 120, 360)
+                    let contentHeight = isImmersiveCoverFlow
+                        ? outerGeometry.size.height
+                        : max(cardWidth + 180, 420)
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         LazyHStack(spacing: overlapSpacing) {
@@ -1142,6 +1486,10 @@ struct RSDRootView: View {
                                     CoverFlowCardView(
                                         listing: listing,
                                         isFavorite: favoritesStore.contains(listing, in: appState.selectedList),
+                                        themeTint: theme.tint,
+                                        cardWidth: cardWidth,
+                                        showsMetadata: true,
+                                        prefersCompactArtwork: isImmersiveCoverFlow,
                                         onTap: {
                                             navigateToDetail(for: listing)
                                         },
@@ -1151,15 +1499,26 @@ struct RSDRootView: View {
                                         normalizedDistanceFromCenter: normalizedDistance
                                     )
                                 }
-                                .frame(width: cardWidth, height: 360)
+                                .frame(width: cardWidth, height: itemHeight)
                             }
                         }
                         .padding(.horizontal, max((outerGeometry.size.width - cardWidth) / 2, 24))
                         .padding(.vertical, 30)
-                        .frame(minHeight: 420)
+                        .frame(minHeight: contentHeight)
                     }
                 }
-                .searchable(text: $searchText, prompt: "Search releases")
+                .background(
+                    LinearGradient(
+                        colors: [
+                            theme.backgroundTop.opacity(colorScheme == .dark ? 0.34 : 0.2),
+                            theme.backgroundBottom.opacity(colorScheme == .dark ? 0.24 : 0.12),
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .ignoresSafeArea()
+                )
+                .modifier(CoverFlowSearchModifier(isEnabled: isImmersiveCoverFlow == false, text: $searchText))
             }
         }
     }
@@ -1375,14 +1734,26 @@ struct RSDRootView: View {
                 ForEach(Array(sections.enumerated()), id: \.element.id) { index, section in
                     Text(section.title)
                         .font(.caption2.weight(activeSectionID == section.id ? .bold : .regular))
-                        .foregroundColor(activeSectionID == section.id ? .primary : .secondary)
+                        .foregroundColor(activeSectionID == section.id ? .white : .primary.opacity(0.8))
                         .frame(width: 20, height: itemHeight)
+                        .background {
+                            if activeSectionID == section.id {
+                                Capsule()
+                                    .fill(theme.tint.opacity(colorScheme == .dark ? 0.5 : 0.32))
+                                    .padding(.horizontal, 1)
+                                    .padding(.vertical, 2)
+                            }
+                        }
                 }
             }
             .frame(maxHeight: .infinity, alignment: .center)
             .padding(.vertical, 10)
             .padding(.horizontal, 5)
             .background(.ultraThinMaterial, in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(theme.tint.opacity(colorScheme == .dark ? 0.34 : 0.18), lineWidth: 1)
+            }
             .contentShape(Rectangle())
             .gesture(
                 DragGesture(minimumDistance: 0)

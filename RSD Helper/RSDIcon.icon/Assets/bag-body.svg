@@ -1,0 +1,13 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bagTone" x1="512" y1="486" x2="512" y2="936" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F4F7FB" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#CDD4DE" stop-opacity="0.1"/>
+    </linearGradient>
+  </defs>
+  <path d="M290 494H734C783.706 494 824 534.294 824 584V832C824 884.467 781.467 927 729 927H295C242.533 927 200 884.467 200 832V584C200 534.294 240.294 494 290 494Z" fill="url(#bagTone)"/>
+  <path d="M236 832V584C236 554.177 260.177 530 290 530" stroke="#FAFCFF" stroke-opacity="0.8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M788 832V584C788 554.177 763.823 530 734 530" stroke="#FAFCFF" stroke-opacity="0.8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M295 891H729C761.033 891 787 865.033 787 833" stroke="#FAFCFF" stroke-opacity="0.8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M295 891C262.967 891 237 865.033 237 833" stroke="#FAFCFF" stroke-opacity="0.8" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
