@@ -149,11 +149,17 @@ private final class StoreListCell: UITableViewCell {
 }
 
 final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
+    private enum StorageKey {
+        static let mapType = "stores_map_type"
+    }
+
     private let mapView = MKMapView()
     private let tableView = UITableView(frame: .zero, style: .plain)
     private let locationManager = CLLocationManager()
     private let geocoder = CLGeocoder()
     private let resolvedCoordinateStore = ResolvedStoreCoordinateStore.shared
+    private let distanceFormatter = MKDistanceFormatter()
+    private let defaults = UserDefaults.standard
     private var allStores = [ParticipatingStoreRecord]()
     private var filteredStores = [ParticipatingStoreRecord]()
     private var pinnedStores = [ParticipatingStore]()
@@ -371,6 +377,7 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
 
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        applySavedMapType()
 
         SelectedStoreStore.shared.$selectedStore
             .receive(on: DispatchQueue.main)
@@ -548,17 +555,42 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
     @objc private func toggleMapType() {
         switch mapView.mapType {
         case .standard:
-            mapView.mapType = .mutedStandard
-            mapTypeButton.setImage(UIImage(systemName: "map.circle.fill"), for: .normal)
+            updateMapType(.mutedStandard)
         case .mutedStandard:
-            mapView.mapType = .hybrid
-            mapTypeButton.setImage(UIImage(systemName: "globe.americas.fill"), for: .normal)
+            updateMapType(.hybrid)
         case .hybrid:
-            mapView.mapType = .satellite
-            mapTypeButton.setImage(UIImage(systemName: "sparkles"), for: .normal)
+            updateMapType(.satellite)
         default:
-            mapView.mapType = .standard
-            mapTypeButton.setImage(UIImage(systemName: "map.fill"), for: .normal)
+            updateMapType(.standard)
+        }
+    }
+
+    private func applySavedMapType() {
+        let rawValue = defaults.integer(forKey: StorageKey.mapType)
+        let savedType = MKMapType(rawValue: UInt(rawValue)) ?? .standard
+        updateMapType(savedType, persist: false)
+    }
+
+    private func updateMapType(_ mapType: MKMapType, persist: Bool = true) {
+        mapView.mapType = mapType
+        mapTypeButton.setImage(UIImage(systemName: mapTypeSymbolName(for: mapType)), for: .normal)
+        if persist {
+            defaults.set(Int(mapType.rawValue), forKey: StorageKey.mapType)
+        }
+    }
+
+    private func mapTypeSymbolName(for mapType: MKMapType) -> String {
+        switch mapType {
+        case .standard:
+            return "map.fill"
+        case .mutedStandard:
+            return "map.circle.fill"
+        case .hybrid:
+            return "globe.americas.fill"
+        case .satellite:
+            return "sparkles"
+        default:
+            return "map.fill"
         }
     }
 
@@ -587,13 +619,11 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
             .filter { !$0.isEmpty }
             .joined(separator: ", ")
         let distanceLine = distanceText(for: store)
-        selectedStoreSubtitleLabel.text = [
-            locationLine.isEmpty ? store.country : locationLine,
-            distanceLine
-        ]
-        .compactMap { $0 }
-        .filter { !$0.isEmpty }
-        .joined(separator: "\n")
+        let primaryLocation = locationLine.isEmpty ? store.country : locationLine
+        selectedStoreSubtitleLabel.text = [primaryLocation, distanceLine]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+            .joined(separator: " • ")
     }
 
     private func distanceText(for store: ParticipatingStoreRecord) -> String? {
@@ -602,8 +632,9 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
             return nil
         }
         let destination = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        let miles = currentUserLocation.distance(from: destination) / 1609.344
-        return miles < 10 ? String(format: "%.1f mi away", miles) : String(format: "%.0f mi away", miles)
+        let distanceInMeters = currentUserLocation.distance(from: destination)
+        distanceFormatter.unitStyle = .abbreviated
+        return distanceFormatter.string(fromDistance: distanceInMeters)
     }
 
     private func abbreviatedRegion(_ value: String) -> String {
@@ -676,22 +707,36 @@ final class RSDStoreMapViewController: UIViewController, MKMapViewDelegate, CLLo
     }
 
     private func openDirections(for store: ParticipatingStoreRecord) {
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = geocodeQuery(for: store)
         if let coordinate = effectiveCoordinate(for: store) {
-            let placemark = MKPlacemark(coordinate: coordinate)
-            let item = MKMapItem(placemark: placemark)
-            item.name = store.displayName
-            item.openInMaps()
-            return
+            request.region = MKCoordinateRegion(
+                center: coordinate,
+                latitudinalMeters: 12_000,
+                longitudinalMeters: 12_000
+            )
         }
 
-        let query = store.googleMapsQuery.isEmpty == false ? store.googleMapsQuery : [store.displayName, store.formattedAddress, store.country]
-            .filter { !$0.isEmpty }
-            .joined(separator: ", ")
-        guard let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
-              let url = URL(string: "http://maps.apple.com/?q=\(encoded)") else {
-            return
+        let fallbackItem = store.mapItem()
+
+        MKLocalSearch(request: request).start { response, _ in
+            if let bestMatch = response?.mapItems.first {
+                bestMatch.openInMaps()
+                return
+            }
+
+            if CLLocationCoordinate2DIsValid(fallbackItem.placemark.coordinate) {
+                fallbackItem.openInMaps()
+                return
+            }
+
+            let query = self.geocodeQuery(for: store)
+            guard let encoded = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+                  let url = URL(string: "http://maps.apple.com/?q=\(encoded)") else {
+                return
+            }
+            UIApplication.shared.open(url)
         }
-        UIApplication.shared.open(url)
     }
 
     private func openWebsite(for store: ParticipatingStoreRecord) {
