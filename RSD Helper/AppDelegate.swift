@@ -55,6 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     enum Shortcut: String {
         case favorites = "Favorites"
+        case wishlist = "Wishlist"
         case stores = "Stores"
     }
     
@@ -65,6 +66,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let shortcutType = Shortcut.init(rawValue: type!) {
             switch shortcutType {
             case .favorites:
+                RSDAppState.shared.presentedSheet = .favorites
+                quickActionHandled = true
+            case .wishlist:
                 RSDAppState.shared.presentedSheet = .favorites
                 quickActionHandled = true
             case .stores:

@@ -44,6 +44,58 @@ struct ReleaseSection: Identifiable {
     let listings: [Listing]
 }
 
+struct WishlistedEntry: Identifiable {
+    let list: RSDListDefinition
+    let listing: Listing
+
+    var id: String {
+        "\(list.slug)::\(listing.id)"
+    }
+}
+
+enum ReleaseAcquisitionStatus: String, CaseIterable, Identifiable {
+    case gotIt = "got_it"
+    case noLuck = "no_luck"
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .gotIt:
+            return "Got It"
+        case .noLuck:
+            return "No Luck"
+        }
+    }
+
+    var shortLabel: String {
+        switch self {
+        case .gotIt:
+            return "Got It"
+        case .noLuck:
+            return "No Luck"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .gotIt:
+            return "checkmark.circle.fill"
+        case .noLuck:
+            return "xmark.circle.fill"
+        }
+    }
+
+    func color(using themeTint: SwiftUI.Color) -> SwiftUI.Color {
+        switch self {
+        case .gotIt:
+            return .green
+        case .noLuck:
+            return .orange
+        }
+    }
+}
+
 enum RSDViewMode: String, CaseIterable, Identifiable {
     case list = "List"
     case grid = "Grid"
@@ -67,6 +119,14 @@ struct RSDListDefinition: Identifiable, Hashable {
 
     var displayName: String {
         subtitle.isEmpty ? title : "\(title) - \(subtitle)"
+    }
+
+    var yearLabel: String {
+        title
+    }
+
+    var regionLabel: String {
+        subtitle.isEmpty ? "Unknown" : subtitle
     }
 
     var theme: RSDTheme {
@@ -284,6 +344,10 @@ final class RSDAppState: ObservableObject {
             .sorted { (Int($0.year) ?? 0) > (Int($1.year) ?? 0) }
     }()
 
+    static let listOrderBySlug: [String: Int] = Dictionary(
+        uniqueKeysWithValues: availableLists.enumerated().map { ($0.element.slug, $0.offset) }
+    )
+
     @Published var selectedList: RSDListDefinition
     @Published var sortOption: RSDSortOption = .artist
     @Published var isSortReversed: Bool = false
@@ -338,7 +402,11 @@ final class RSDAppState: ObservableObject {
         $selectedList
             .map(\.slug)
             .sink { [weak self] slug in
-                self?.defaults.set(slug, forKey: StorageKey.selectedListSlug)
+                guard let self else { return }
+                self.defaults.set(slug, forKey: StorageKey.selectedListSlug)
+                self.formatFilter = "All Formats"
+                self.releaseCategoryFilter = "All Categories"
+                self.quantityFilter = "All Quantities"
             }
             .store(in: &cancellables)
 
@@ -420,10 +488,11 @@ final class RSDAppState: ObservableObject {
 final class FavoritesStore: ObservableObject {
     static let shared = FavoritesStore()
 
-    @Published private(set) var favoritesByList: [String: Set<String>] = [:]
+    @Published private(set) var wishlistIDsByList: [String: [String]] = [:]
     private let defaults = UserDefaults.standard
     private let ubiquitousStore = NSUbiquitousKeyValueStore.default
-    private let storageKey = "favorites_by_list_v2"
+    private let storageKey = "wishlist_ids_by_list_v3"
+    private let legacyStorageKey = "favorites_by_list_v2"
 
     private init() {
         NotificationCenter.default.addObserver(
@@ -433,68 +502,292 @@ final class FavoritesStore: ObservableObject {
             object: ubiquitousStore
         )
         ubiquitousStore.synchronize()
-        favoritesByList = mergedFavorites(local: decodeFavorites(from: defaults.dictionary(forKey: storageKey)),
-                                          cloud: decodeFavorites(from: ubiquitousStore.dictionary(forKey: storageKey)))
+        let local = decodeWishlistIDs(
+            from: defaults.dictionary(forKey: storageKey),
+            legacyValue: defaults.dictionary(forKey: legacyStorageKey)
+        )
+        let cloud = decodeWishlistIDs(
+            from: ubiquitousStore.dictionary(forKey: storageKey),
+            legacyValue: ubiquitousStore.dictionary(forKey: legacyStorageKey)
+        )
+        wishlistIDsByList = mergedWishlistIDs(local: local, cloud: cloud)
         persist()
     }
 
     func contains(_ listing: Listing, in list: RSDListDefinition) -> Bool {
-        favoritesByList[list.slug, default: []].contains(listing.id)
+        wishlistIDsByList[list.slug, default: []].contains(listing.id)
     }
 
     func toggle(_ listing: Listing, in list: RSDListDefinition) {
-        var favorites = favoritesByList[list.slug, default: []]
-        if favorites.contains(listing.id) {
-            favorites.remove(listing.id)
+        var wishlistIDs = wishlistIDsByList[list.slug, default: []]
+        if let existingIndex = wishlistIDs.firstIndex(of: listing.id) {
+            wishlistIDs.remove(at: existingIndex)
         } else {
-            favorites.insert(listing.id)
+            wishlistIDs.insert(listing.id, at: 0)
         }
-        favoritesByList[list.slug] = favorites
+        wishlistIDsByList[list.slug] = wishlistIDs
+        persist()
+    }
+
+    func move(fromOffsets offsets: IndexSet, toOffset destination: Int, in list: RSDListDefinition) {
+        var wishlistIDs = wishlistIDsByList[list.slug, default: []]
+        wishlistIDs.move(fromOffsets: offsets, toOffset: destination)
+        wishlistIDsByList[list.slug] = wishlistIDs
+        persist()
+    }
+
+    func moveToTop(_ listing: Listing, in list: RSDListDefinition) {
+        var wishlistIDs = wishlistIDsByList[list.slug, default: []]
+        guard let currentIndex = wishlistIDs.firstIndex(of: listing.id), currentIndex != 0 else {
+            return
+        }
+        wishlistIDs.remove(at: currentIndex)
+        wishlistIDs.insert(listing.id, at: 0)
+        wishlistIDsByList[list.slug] = wishlistIDs
+        persist()
+    }
+
+    func sortByArtist(in list: RSDListDefinition, from listings: [Listing]) {
+        sort(in: list, from: listings) {
+            ($0.artist.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current),
+             $0.album.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current))
+            <
+            ($1.artist.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current),
+             $1.album.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current))
+        }
+    }
+
+    func sortByTitle(in list: RSDListDefinition, from listings: [Listing]) {
+        sort(in: list, from: listings) {
+            ($0.album.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current),
+             $0.artist.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current))
+            <
+            ($1.album.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current),
+             $1.artist.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current))
+        }
+    }
+
+    func sortByGotIt(in list: RSDListDefinition, from listings: [Listing], statuses: [String: ReleaseAcquisitionStatus]) {
+        sort(in: list, from: listings) { lhs, rhs in
+            let lhsGotIt = statuses[lhs.id] == .gotIt
+            let rhsGotIt = statuses[rhs.id] == .gotIt
+            if lhsGotIt != rhsGotIt {
+                return lhsGotIt && !rhsGotIt
+            }
+
+            let lhsNoLuck = statuses[lhs.id] == .noLuck
+            let rhsNoLuck = statuses[rhs.id] == .noLuck
+            if lhsNoLuck != rhsNoLuck {
+                return !lhsNoLuck && rhsNoLuck
+            }
+
+            return
+                (lhs.artist.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current),
+                 lhs.album.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current))
+                <
+                (rhs.artist.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current),
+                 rhs.album.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current))
+        }
+    }
+
+    func clear(in list: RSDListDefinition) {
+        wishlistIDsByList[list.slug] = []
         persist()
     }
 
     func favorites(in list: RSDListDefinition, from listings: [Listing]) -> [Listing] {
-        let ids = favoritesByList[list.slug, default: []]
-        return listings.filter { ids.contains($0.id) }
+        let listingByID = Dictionary(uniqueKeysWithValues: listings.map { ($0.id, $0) })
+        return wishlistIDsByList[list.slug, default: []].compactMap { listingByID[$0] }
+    }
+
+    func allWishlistedEntries(
+        lists: [RSDListDefinition],
+        listingsResolver: (RSDListDefinition) -> [Listing]
+    ) -> [WishlistedEntry] {
+        lists.flatMap { list -> [WishlistedEntry] in
+            let listings = listingsResolver(list)
+            let listingByID = Dictionary(uniqueKeysWithValues: listings.map { ($0.id, $0) })
+            return wishlistIDsByList[list.slug, default: []].compactMap { listingID -> WishlistedEntry? in
+                guard let listing = listingByID[listingID] else {
+                    return nil
+                }
+                return WishlistedEntry(list: list, listing: listing)
+            }
+        }
+    }
+
+    private func sort(in list: RSDListDefinition, from listings: [Listing], by areInIncreasingOrder: (Listing, Listing) -> Bool) {
+        let listingByID = Dictionary(uniqueKeysWithValues: listings.map { ($0.id, $0) })
+        let sortedIDs = wishlistIDsByList[list.slug, default: []]
+            .compactMap { listingByID[$0] }
+            .sorted(by: areInIncreasingOrder)
+            .map(\.id)
+        wishlistIDsByList[list.slug] = sortedIDs
+        persist()
     }
 
     private func persist() {
-        let payload = serializedFavorites
+        let payload = serializedWishlistIDs
+        defaults.set(payload, forKey: storageKey)
+        defaults.set(payload, forKey: legacyStorageKey)
+        ubiquitousStore.set(payload, forKey: storageKey)
+        ubiquitousStore.set(payload, forKey: legacyStorageKey)
+        ubiquitousStore.synchronize()
+    }
+
+    private var serializedWishlistIDs: [String: [String]] {
+        wishlistIDsByList.reduce(into: [String: [String]]()) { partialResult, entry in
+            partialResult[entry.key] = entry.value
+        }
+    }
+
+    private func decodeWishlistIDs(from value: Any?, legacyValue: Any?) -> [String: [String]] {
+        guard let stored = value as? [String: [String]] else {
+            return decodeLegacyWishlistIDs(from: legacyValue)
+        }
+        return stored.reduce(into: [:]) { partialResult, entry in
+            partialResult[entry.key] = deduplicated(entry.value)
+        }
+    }
+
+    private func decodeLegacyWishlistIDs(from value: Any?) -> [String: [String]] {
+        guard let stored = value as? [String: [String]] else {
+            return [:]
+        }
+        return stored.reduce(into: [:]) { partialResult, entry in
+            partialResult[entry.key] = deduplicated(entry.value)
+        }
+    }
+
+    private func deduplicated(_ values: [String]) -> [String] {
+        var seen = Set<String>()
+        return values.filter { seen.insert($0).inserted }
+    }
+
+    private func mergedWishlistIDs(local: [String: [String]], cloud: [String: [String]]) -> [String: [String]] {
+        let keys = Set(local.keys).union(cloud.keys)
+        return keys.reduce(into: [:]) { partialResult, key in
+            var merged = cloud[key, default: []]
+            for listingID in local[key, default: []] where merged.contains(listingID) == false {
+                merged.append(listingID)
+            }
+            partialResult[key] = merged
+        }
+    }
+
+    @objc private func handleUbiquitousStoreChange(_ notification: Notification) {
+        let cloudWishlistIDs = decodeWishlistIDs(
+            from: ubiquitousStore.dictionary(forKey: storageKey),
+            legacyValue: ubiquitousStore.dictionary(forKey: legacyStorageKey)
+        )
+        let merged = mergedWishlistIDs(local: wishlistIDsByList, cloud: cloudWishlistIDs)
+        guard merged != wishlistIDsByList else {
+            return
+        }
+        wishlistIDsByList = merged
+        let payload = serializedWishlistIDs
+        defaults.set(payload, forKey: storageKey)
+        defaults.set(payload, forKey: legacyStorageKey)
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+}
+
+final class ReleaseStatusStore: ObservableObject {
+    static let shared = ReleaseStatusStore()
+
+    @Published private(set) var statusByList: [String: [String: String]] = [:]
+    private let defaults = UserDefaults.standard
+    private let ubiquitousStore = NSUbiquitousKeyValueStore.default
+    private let storageKey = "release_status_by_list_v1"
+
+    private init() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleUbiquitousStoreChange(_:)),
+            name: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+            object: ubiquitousStore
+        )
+        ubiquitousStore.synchronize()
+        let local = decodeStatuses(from: defaults.dictionary(forKey: storageKey))
+        let cloud = decodeStatuses(from: ubiquitousStore.dictionary(forKey: storageKey))
+        statusByList = mergedStatuses(local: local, cloud: cloud)
+        persist()
+    }
+
+    func status(for listing: Listing, in list: RSDListDefinition) -> ReleaseAcquisitionStatus? {
+        guard let rawValue = statusByList[list.slug]?[listing.id] else {
+            return nil
+        }
+        return ReleaseAcquisitionStatus(rawValue: rawValue)
+    }
+
+    func setStatus(_ status: ReleaseAcquisitionStatus?, for listing: Listing, in list: RSDListDefinition) {
+        var statuses = statusByList[list.slug, default: [:]]
+        if let status {
+            statuses[listing.id] = status.rawValue
+        } else {
+            statuses.removeValue(forKey: listing.id)
+        }
+        statusByList[list.slug] = statuses
+        persist()
+    }
+
+    func clear(in list: RSDListDefinition) {
+        statusByList[list.slug] = [:]
+        persist()
+    }
+
+    private func persist() {
+        let payload = statusByList
         defaults.set(payload, forKey: storageKey)
         ubiquitousStore.set(payload, forKey: storageKey)
         ubiquitousStore.synchronize()
     }
 
-    private var serializedFavorites: [String: [String]] {
-        favoritesByList.reduce(into: [String: [String]]()) { partialResult, entry in
-            partialResult[entry.key] = Array(entry.value).sorted()
-        }
-    }
-
-    private func decodeFavorites(from value: Any?) -> [String: Set<String>] {
-        guard let stored = value as? [String: [String]] else {
+    private func decodeStatuses(from value: Any?) -> [String: [String: String]] {
+        guard let stored = value as? [String: [String: String]] else {
             return [:]
         }
         return stored.reduce(into: [:]) { partialResult, entry in
-            partialResult[entry.key] = Set(entry.value)
+            partialResult[entry.key] = entry.value.reduce(into: [:]) { normalizedStatuses, statusEntry in
+                let normalizedValue: String
+                switch statusEntry.value {
+                case "found_it":
+                    normalizedValue = ReleaseAcquisitionStatus.gotIt.rawValue
+                case ReleaseAcquisitionStatus.gotIt.rawValue, ReleaseAcquisitionStatus.noLuck.rawValue:
+                    normalizedValue = statusEntry.value
+                default:
+                    return
+                }
+                normalizedStatuses[statusEntry.key] = normalizedValue
+            }
         }
     }
 
-    private func mergedFavorites(local: [String: Set<String>], cloud: [String: Set<String>]) -> [String: Set<String>] {
+    private func mergedStatuses(local: [String: [String: String]], cloud: [String: [String: String]]) -> [String: [String: String]] {
         let keys = Set(local.keys).union(cloud.keys)
-        return keys.reduce(into: [:]) { partialResult, key in
-            partialResult[key] = local[key, default: []].union(cloud[key, default: []])
+        return keys.reduce(into: [String: [String: String]]()) { partialResult, key in
+            var merged = local[key, default: [:]]
+            for (listingID, status) in cloud[key, default: [:]] {
+                if merged[listingID] == nil {
+                    merged[listingID] = status
+                }
+            }
+            partialResult[key] = merged
         }
     }
 
     @objc private func handleUbiquitousStoreChange(_ notification: Notification) {
-        let cloudFavorites = decodeFavorites(from: ubiquitousStore.dictionary(forKey: storageKey))
-        let merged = mergedFavorites(local: favoritesByList, cloud: cloudFavorites)
-        guard merged != favoritesByList else {
+        let cloudStatuses = decodeStatuses(from: ubiquitousStore.dictionary(forKey: storageKey))
+        let merged = mergedStatuses(local: statusByList, cloud: cloudStatuses)
+        guard merged != statusByList else {
             return
         }
-        favoritesByList = merged
-        defaults.set(serializedFavorites, forKey: storageKey)
+        statusByList = merged
+        defaults.set(statusByList, forKey: storageKey)
     }
 
     deinit {
@@ -508,24 +801,38 @@ final class ReleaseLibrary: ObservableObject {
     @Published private(set) var releases: [Listing] = []
     @Published private(set) var currentList: RSDListDefinition = RSDAppState.availableLists.first ?? RSDListDefinition(slug: "empty", title: "Empty", subtitle: "", resourceName: "")
     @Published private(set) var loadError: String?
+    private var cachedListingsBySlug: [String: [Listing]] = [:]
 
     func load(_ list: RSDListDefinition) {
         currentList = list
         loadError = nil
-
-        guard let file = Bundle.main.url(forResource: list.resourceName, withExtension: "json") else {
-            releases = []
-            loadError = "Could not find \(list.resourceName).json in the app bundle."
-            return
-        }
-
         do {
-            let data = try Data(contentsOf: file)
-            releases = try ListingLoader.loadCanonicalListings(from: data)
+            releases = try loadListings(for: list)
         } catch {
             releases = []
             loadError = error.localizedDescription
         }
+    }
+
+    func listings(for list: RSDListDefinition) -> [Listing] {
+        (try? loadListings(for: list)) ?? []
+    }
+
+    private func loadListings(for list: RSDListDefinition) throws -> [Listing] {
+        if let cached = cachedListingsBySlug[list.slug] {
+            return cached
+        }
+
+        guard let file = Bundle.main.url(forResource: list.resourceName, withExtension: "json") else {
+            throw NSError(domain: "RSDHelper.ReleaseLibrary", code: 1, userInfo: [
+                NSLocalizedDescriptionKey: "Could not find \(list.resourceName).json in the app bundle."
+            ])
+        }
+
+        let data = try Data(contentsOf: file)
+        let loadedListings = try ListingLoader.loadCanonicalListings(from: data)
+        cachedListingsBySlug[list.slug] = loadedListings
+        return loadedListings
     }
 
     func sortedReleases(using sortOption: RSDSortOption) -> [Listing] {
@@ -548,6 +855,7 @@ final class ReleaseLibrary: ObservableObject {
 
 final class ArtworkPipeline {
     static let shared = ArtworkPipeline()
+    static let isArtworkLoadingEnabled = true
 
     private let imageCache = NSCache<NSURL, UIImage>()
     private let urlCache: URLCache
@@ -596,6 +904,10 @@ final class ArtworkPipeline {
     }
 
     func cachedImage(for url: URL) -> UIImage? {
+        guard Self.isArtworkLoadingEnabled else {
+            return nil
+        }
+
         let cacheKey = url as NSURL
         if let image = imageCache.object(forKey: cacheKey) {
             return image
@@ -612,6 +924,10 @@ final class ArtworkPipeline {
     }
 
     func loadImage(from url: URL, priority: LoadPriority = .normal) async throws -> UIImage? {
+        guard Self.isArtworkLoadingEnabled else {
+            return nil
+        }
+
         if let cached = cachedImage(for: url) {
             return cached
         }
@@ -719,6 +1035,10 @@ final class ArtworkLoader: ObservableObject {
     }
 
     func loadIfNeeded() {
+        guard ArtworkPipeline.isArtworkLoadingEnabled else {
+            return
+        }
+
         guard image == nil, loadTask == nil, let url = URL(string: urlString), urlString.isEmpty == false else {
             return
         }
@@ -1101,6 +1421,7 @@ struct ReleaseRowView: View {
     let listing: Listing
     let isFavorite: Bool
     let themeTint: SwiftUI.Color
+    let status: ReleaseAcquisitionStatus?
     let onFavoriteToggle: () -> Void
     @Environment(\.colorScheme) private var colorScheme
 
@@ -1119,6 +1440,9 @@ struct ReleaseRowView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .lineLimit(1)
+                if let status {
+                    StatusBadge(status: status, themeTint: themeTint, usesCompactLabel: false)
+                }
                 Text(listing.format)
                     .font(.caption)
                     .foregroundColor(.secondary)
@@ -1128,8 +1452,8 @@ struct ReleaseRowView: View {
             Spacer(minLength: 8)
 
             SwiftUI.Button(action: onFavoriteToggle) {
-                SwiftUI.Image(systemName: isFavorite ? "heart.fill" : "heart")
-                    .foregroundColor(isFavorite ? .red : .secondary)
+                SwiftUI.Image(systemName: isFavorite ? "bookmark.fill" : "bookmark")
+                    .foregroundColor(isFavorite ? themeTint : .secondary)
                     .font(.system(size: 18, weight: .semibold))
             }
             .buttonStyle(BorderlessButtonStyle())
@@ -1153,6 +1477,8 @@ struct ReleaseGridCardView: View {
     let listing: Listing
     let isFavorite: Bool
     let themeTint: SwiftUI.Color
+    let subtitleText: String?
+    let status: ReleaseAcquisitionStatus?
     let onFavoriteToggle: () -> Void
 
     var body: some View {
@@ -1176,6 +1502,15 @@ struct ReleaseGridCardView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .lineLimit(1)
+                    if let status {
+                        StatusBadge(status: status, themeTint: themeTint, usesCompactLabel: true)
+                    }
+                    if let subtitleText, subtitleText.isEmpty == false {
+                        Text(subtitleText)
+                            .font(.caption)
+                            .foregroundColor(themeTint)
+                            .lineLimit(1)
+                    }
                     Text(listing.format)
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -1185,9 +1520,9 @@ struct ReleaseGridCardView: View {
                 Spacer(minLength: 8)
 
                 SwiftUI.Button(action: onFavoriteToggle) {
-                    SwiftUI.Image(systemName: isFavorite ? "heart.fill" : "heart")
+                    SwiftUI.Image(systemName: isFavorite ? "bookmark.fill" : "bookmark")
                         .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(isFavorite ? .red : .secondary)
+                        .foregroundColor(isFavorite ? themeTint : .secondary)
                 }
                 .buttonStyle(.plain)
             }
@@ -1209,6 +1544,8 @@ struct CoverFlowCardView: View {
     let themeTint: SwiftUI.Color
     let cardWidth: CGFloat
     let showsMetadata: Bool
+    let subtitleText: String?
+    let status: ReleaseAcquisitionStatus?
     let prefersCompactArtwork: Bool
     let onTap: () -> Void
     let onFavoriteToggle: () -> Void
@@ -1241,15 +1578,25 @@ struct CoverFlowCardView: View {
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
+                        if let status {
+                            StatusBadge(status: status, themeTint: themeTint, usesCompactLabel: true)
+                        }
+                        if let subtitleText, subtitleText.isEmpty == false {
+                            Text(subtitleText)
+                                .font(.caption)
+                                .foregroundColor(themeTint)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(1)
+                        }
                         Text(listing.format)
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
 
                     SwiftUI.Button(action: onFavoriteToggle) {
-                        SwiftUI.Image(systemName: isFavorite ? "heart.fill" : "heart")
+                        SwiftUI.Image(systemName: isFavorite ? "bookmark.fill" : "bookmark")
                             .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(isFavorite ? .red : .secondary)
+                            .foregroundColor(isFavorite ? themeTint : .secondary)
                     }
                     .buttonStyle(.plain)
                 }
@@ -1276,8 +1623,35 @@ struct CoverFlowCardView: View {
     }
 
     private var artworkDimension: CGFloat {
-        let scale: CGFloat = prefersCompactArtwork ? 0.78 : 1
-        return min(cardWidth * scale, prefersCompactArtwork ? 280 : 360)
+        let isPad = UIDevice.current.userInterfaceIdiom == .pad
+        let scale: CGFloat = prefersCompactArtwork ? 0.88 : 1
+        if prefersCompactArtwork {
+            return min(cardWidth * scale, isPad ? 680 : 340)
+        }
+        return min(cardWidth * scale, isPad ? 520 : 360)
+    }
+}
+
+struct StatusBadge: View {
+    let status: ReleaseAcquisitionStatus
+    let themeTint: SwiftUI.Color
+    let usesCompactLabel: Bool
+
+    var body: some View {
+        HStack(spacing: 4) {
+            SwiftUI.Image(systemName: status.systemImage)
+                .font(.system(size: 10, weight: .bold))
+
+            Text(usesCompactLabel ? status.shortLabel : status.label)
+                .font(.caption2.weight(.semibold))
+        }
+        .foregroundColor(status.color(using: themeTint))
+        .padding(.horizontal, 6)
+        .padding(.vertical, 3)
+            .background(
+                Capsule(style: .continuous)
+                    .fill(status.color(using: themeTint).opacity(0.14))
+            )
     }
 }
 
@@ -1298,33 +1672,76 @@ struct RSDRootView: View {
     @ObservedObject var appState: RSDAppState
     @ObservedObject private var library = ReleaseLibrary.shared
     @ObservedObject private var favoritesStore = FavoritesStore.shared
+    @ObservedObject private var releaseStatusStore = ReleaseStatusStore.shared
     @Environment(\.colorScheme) private var colorScheme
     @State private var searchText = ""
     @State private var selectedCoverFlowListing: Listing?
     @State private var activeSectionID: String?
     @State private var selectedTab: RSDMainTab = .releases
+    @State private var showsStartupAnimation = false
+    @State private var showsImmersiveCoverFlowHint = false
 
     private var theme: RSDThemePalette {
         appState.selectedList.theme.palette(for: colorScheme)
     }
 
+    init(appState: RSDAppState) {
+        self.appState = appState
+        let library = ReleaseLibrary.shared
+        if library.releases.isEmpty || library.currentList.slug != appState.selectedList.slug {
+            library.load(appState.selectedList)
+        }
+    }
+
     var body: some View {
-        GeometryReader { geometry in
-            let isLandscape = geometry.size.width > geometry.size.height
-            let isImmersiveCoverFlow = appState.viewMode == .coverFlow && geometry.size.width > geometry.size.height
+        ZStack {
+            GeometryReader { geometry in
+                let isLandscape = geometry.size.width > geometry.size.height
+                #if targetEnvironment(macCatalyst)
+                let supportsImmersiveCoverFlow = false
+                #else
+                let supportsImmersiveCoverFlow = true
+                #endif
+                let isImmersiveCoverFlow = supportsImmersiveCoverFlow && appState.viewMode == .coverFlow && geometry.size.width > geometry.size.height
 
-            TabView(selection: $selectedTab) {
-                releasesTab(isImmersiveCoverFlow: isImmersiveCoverFlow, isLandscape: isLandscape)
-                .tabItem {
-                    Label("Releases", systemImage: "music.note.list")
-                }
-                .tag(RSDMainTab.releases)
-
-                StoresMapScreen(showsDoneButton: false)
+                TabView(selection: $selectedTab) {
+                    releasesTab(isImmersiveCoverFlow: isImmersiveCoverFlow, isLandscape: isLandscape)
                     .tabItem {
-                        Label("Stores", systemImage: "map")
+                        Label("Releases", systemImage: "music.note.list")
                     }
-                    .tag(RSDMainTab.stores)
+                    .tag(RSDMainTab.releases)
+
+                    StoresMapScreen(showsDoneButton: false)
+                        .tabItem {
+                            Label("Stores", systemImage: "map")
+                        }
+                        .tag(RSDMainTab.stores)
+                }
+                .onAppear {
+                    maybePresentImmersiveCoverFlowHint(isImmersive: isImmersiveCoverFlow)
+                }
+                .onChange(of: isImmersiveCoverFlow) { isImmersive in
+                    maybePresentImmersiveCoverFlowHint(isImmersive: isImmersive)
+                }
+            }
+
+            if showsStartupAnimation {
+                RSDLaunchOverlayView {
+                    withAnimation(.easeOut(duration: 0.18)) {
+                        showsStartupAnimation = false
+                    }
+                }
+                .transition(.opacity)
+            }
+
+            if showsImmersiveCoverFlowHint, selectedTab == .releases {
+                RSDImmersiveCoverFlowHintView {
+                    dismissImmersiveCoverFlowHint(markAsSeen: true)
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 28)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .tint(theme.tint)
@@ -1339,10 +1756,39 @@ struct RSDRootView: View {
             .accentColor(theme.tint)
         }
         .onAppear {
-            library.load(appState.selectedList)
+            if !RSDStartupPresentationState.hasPresented {
+                RSDStartupPresentationState.hasPresented = true
+                showsStartupAnimation = true
+            }
         }
         .onReceive(appState.$selectedList) { list in
-            library.load(list)
+            if library.currentList.slug != list.slug || library.releases.isEmpty {
+                library.load(list)
+            }
+            searchText = ""
+        }
+    }
+
+    private func maybePresentImmersiveCoverFlowHint(isImmersive: Bool) {
+        guard isImmersive,
+              !showsStartupAnimation,
+              !RSDStartupPresentationState.hasSeenImmersiveCoverFlowHint else {
+            return
+        }
+
+        withAnimation(.spring(response: 0.36, dampingFraction: 0.9)) {
+            showsImmersiveCoverFlowHint = true
+        }
+    }
+
+    private func dismissImmersiveCoverFlowHint(markAsSeen: Bool) {
+        if markAsSeen {
+            RSDStartupPresentationState.hasSeenImmersiveCoverFlowHint = true
+        }
+
+        guard showsImmersiveCoverFlowHint else { return }
+        withAnimation(.easeOut(duration: 0.22)) {
+            showsImmersiveCoverFlowHint = false
         }
     }
 
@@ -1425,7 +1871,7 @@ struct RSDRootView: View {
             SwiftUI.Button {
                 appState.presentedSheet = .favorites
             } label: {
-                SwiftUI.Image(systemName: "heart")
+                SwiftUI.Image(systemName: "bookmark")
             }
 
             toolbarMenu
@@ -1477,9 +1923,7 @@ struct RSDRootView: View {
     private func presentedSheetView(_ sheet: RSDPresentedSheet) -> some View {
         switch sheet {
         case .favorites:
-            NavigationStack {
-                FavoritesView(list: appState.selectedList, showsDoneButton: true)
-            }
+            FavoritesView(list: appState.selectedList, showsDoneButton: true)
 #if targetEnvironment(macCatalyst)
             .frame(minWidth: 760, idealWidth: 980, maxWidth: .infinity, minHeight: 620, idealHeight: 760, maxHeight: .infinity)
 #endif
@@ -1552,6 +1996,7 @@ struct RSDRootView: View {
                                                 listing: listing,
                                                 isFavorite: favoritesStore.contains(listing, in: appState.selectedList),
                                                 themeTint: theme.tint,
+                                                status: releaseStatusStore.status(for: listing, in: appState.selectedList),
                                                 onFavoriteToggle: {
                                                     favoritesStore.toggle(listing, in: appState.selectedList)
                                                 }
@@ -1594,6 +2039,8 @@ struct RSDRootView: View {
                                     listing: listing,
                                     isFavorite: favoritesStore.contains(listing, in: appState.selectedList),
                                     themeTint: theme.tint,
+                                    subtitleText: nil,
+                                    status: releaseStatusStore.status(for: listing, in: appState.selectedList),
                                     onFavoriteToggle: {
                                         favoritesStore.toggle(listing, in: appState.selectedList)
                                     }
@@ -1621,16 +2068,23 @@ struct RSDRootView: View {
                 GeometryReader { outerGeometry in
                     let availableWidth = outerGeometry.size.width
                     let containerHeight = outerGeometry.size.height
+                    let isPad = UIDevice.current.userInterfaceIdiom == .pad
                     let cardWidth = isImmersiveCoverFlow
-                        ? min(max(min(availableWidth * 0.42, containerHeight * 0.52), 220), 320)
-                        : min(max(availableWidth * 0.62, 240), 420)
-                    let overlapSpacing = -cardWidth * 0.14
+                        ? (isPad
+                            ? min(max(min(availableWidth * 0.72, containerHeight * 1.12), 520), 760)
+                            : min(max(min(availableWidth * 0.46, containerHeight * 0.68), 260), 420))
+                        : (isPad
+                            ? min(max(availableWidth * 0.72, 320), 560)
+                            : min(max(availableWidth * 0.62, 240), 420))
+                    let overlapSpacing = isImmersiveCoverFlow && isPad ? -cardWidth * 0.06 : -cardWidth * 0.14
                     let itemHeight = isImmersiveCoverFlow
-                        ? min(max(cardWidth + 118, 330), max(containerHeight - 32, 280))
-                        : max(cardWidth + 120, 360)
+                        ? (isPad
+                            ? max(containerHeight + 40, cardWidth + 120)
+                            : max(containerHeight - 28, cardWidth + 140))
+                        : (isPad ? max(cardWidth + 150, 460) : max(cardWidth + 120, 360))
                     let contentHeight = isImmersiveCoverFlow
-                        ? outerGeometry.size.height
-                        : max(cardWidth + 180, 420)
+                        ? (isPad ? outerGeometry.size.height + 72 : outerGeometry.size.height + 40)
+                        : (isPad ? max(cardWidth + 210, 560) : max(cardWidth + 180, 420))
 
                     ScrollView(.horizontal, showsIndicators: false) {
                         LazyHStack(spacing: overlapSpacing) {
@@ -1647,6 +2101,8 @@ struct RSDRootView: View {
                                         themeTint: theme.tint,
                                         cardWidth: cardWidth,
                                         showsMetadata: true,
+                                        subtitleText: nil,
+                                        status: releaseStatusStore.status(for: listing, in: appState.selectedList),
                                         prefersCompactArtwork: isImmersiveCoverFlow,
                                         onTap: {
                                             navigateToDetail(for: listing)
@@ -1660,10 +2116,13 @@ struct RSDRootView: View {
                                 .frame(width: cardWidth, height: itemHeight)
                             }
                         }
+                        .frame(maxHeight: .infinity, alignment: .center)
                         .padding(.horizontal, max((outerGeometry.size.width - cardWidth) / 2, 24))
-                        .padding(.vertical, 30)
+                        .padding(.top, isImmersiveCoverFlow ? (isPad ? 4 : 26) : 30)
+                        .padding(.bottom, isImmersiveCoverFlow ? (isPad ? 4 : 14) : 30)
                         .frame(minHeight: contentHeight)
                     }
+                    .frame(maxHeight: .infinity, alignment: .center)
                 }
                 .background(
                     LinearGradient(
@@ -1940,6 +2399,267 @@ struct RSDRootView: View {
 
     private func navigateToDetail(for listing: Listing) {
         selectedCoverFlowListing = listing
+    }
+}
+
+private enum RSDStartupPresentationState {
+    static var hasPresented = false
+    static let debugLoopEnabled = false
+    static var hasSeenImmersiveCoverFlowHint: Bool {
+        get { UserDefaults.standard.bool(forKey: "hasSeenImmersiveCoverFlowHint") }
+        set { UserDefaults.standard.set(newValue, forKey: "hasSeenImmersiveCoverFlowHint") }
+    }
+}
+
+private struct RSDLaunchOverlayView: View {
+    let onFinish: () -> Void
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var settled = false
+    @State private var spinning = false
+    @State private var fadingOut = false
+
+    var body: some View {
+        ZStack {
+            LinearGradient(
+                colors: [
+                    SwiftUI.Color(red: 0.03, green: 0.04, blue: 0.06),
+                    SwiftUI.Color(red: 0.08, green: 0.03, blue: 0.05),
+                    SwiftUI.Color(red: 0.02, green: 0.02, blue: 0.03)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [
+                            SwiftUI.Color(red: 0.83, green: 0.25, blue: 0.31).opacity(0.22),
+                            .clear
+                        ],
+                        center: .center,
+                        startRadius: 20,
+                        endRadius: 340
+                    )
+                )
+                .frame(width: 680, height: 680)
+                .blur(radius: 16)
+
+            RSDAnimatedLaunchRecord(spinning: spinning && !reduceMotion)
+                .scaleEffect(settled ? 1.0 : 2.35)
+                .offset(y: settled ? 0 : 188)
+                .opacity(fadingOut ? 0 : 1)
+                .animation(.spring(response: 0.92, dampingFraction: 0.86), value: settled)
+                .animation(.easeInOut(duration: 0.28), value: fadingOut)
+        }
+        .ignoresSafeArea()
+        .task {
+            while !Task.isCancelled {
+                settled = false
+                spinning = false
+                fadingOut = false
+
+                try? await Task.sleep(nanoseconds: 70_000_000)
+                settled = true
+
+                if !reduceMotion {
+                    try? await Task.sleep(nanoseconds: 760_000_000)
+                    spinning = true
+                }
+
+                try? await Task.sleep(nanoseconds: reduceMotion ? 1_000_000_000 : 820_000_000)
+                fadingOut = true
+
+                try? await Task.sleep(nanoseconds: 280_000_000)
+                if RSDStartupPresentationState.debugLoopEnabled {
+                    try? await Task.sleep(nanoseconds: 220_000_000)
+                    continue
+                }
+
+                onFinish()
+                break
+            }
+        }
+    }
+}
+
+private struct RSDImmersiveCoverFlowHintView: View {
+    let onDismiss: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                SwiftUI.Image(systemName: "rectangle.rotate.vertical")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(.white)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Landscape Cover Flow")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(.white)
+
+                    Text("Menus hide in this immersive mode. Rotate back to portrait to access filters and actions again.")
+                        .font(.subheadline)
+                        .foregroundStyle(.white.opacity(0.88))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 0)
+
+                SwiftUI.Button(action: onDismiss) {
+                    SwiftUI.Image(systemName: "xmark")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(.white.opacity(0.9))
+                        .padding(8)
+                        .background(.white.opacity(0.12), in: Circle())
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(.black.opacity(0.76))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(.white.opacity(0.12), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.25), radius: 18, y: 10)
+    }
+}
+
+private struct RSDAnimatedLaunchRecord: View {
+    let spinning: Bool
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(SwiftUI.Color(red: 0.05, green: 0.05, blue: 0.07))
+                .frame(width: 346 * 2, height: 346 * 2)
+                .overlay {
+                    Circle()
+                        .fill(
+                            RadialGradient(
+                                colors: [
+                                    SwiftUI.Color(red: 0.36, green: 0.39, blue: 0.45),
+                                    SwiftUI.Color(red: 0.11, green: 0.12, blue: 0.15),
+                                    SwiftUI.Color(red: 0.03, green: 0.03, blue: 0.04)
+                                ],
+                                center: UnitPoint(x: 0.38, y: 0.28),
+                                startRadius: 12,
+                                endRadius: 520
+                            )
+                        )
+                }
+                .rotationEffect(.degrees(spinning ? 360 : 0))
+                .animation(spinning ? .linear(duration: 2.4).repeatForever(autoreverses: false) : .default, value: spinning)
+
+            let grooveBands: [(start: Double, end: Double, step: Double, opacity: Double)] = [
+                (338, 326, 1.7, 0.34), // lead-in
+                (320, 296, 2.0, 0.30),
+                (288, 280, 1.7, 0.20), // shorter track
+                (272, 238, 2.1, 0.28),
+                (230, 214, 1.8, 0.22),
+                (206, 196, 1.4, 0.34)  // lead-out
+            ]
+
+            Circle()
+                .stroke(SwiftUI.Color(red: 0.30, green: 0.33, blue: 0.38).opacity(0.55), lineWidth: 2)
+                .frame(width: 360 * 2, height: 360 * 2)
+                .rotationEffect(.degrees(spinning ? 360 : 0))
+                .animation(spinning ? .linear(duration: 2.4).repeatForever(autoreverses: false) : .default, value: spinning)
+
+            Circle()
+                .stroke(SwiftUI.Color(red: 0.18, green: 0.20, blue: 0.24).opacity(0.45), lineWidth: 0.9)
+                .frame(width: 346 * 2, height: 346 * 2)
+                .rotationEffect(.degrees(spinning ? 360 : 0))
+                .animation(spinning ? .linear(duration: 2.4).repeatForever(autoreverses: false) : .default, value: spinning)
+
+            ForEach(Array(grooveBands.enumerated()), id: \.offset) { bandIndex, band in
+                ForEach(Array(stride(from: band.start, through: band.end, by: -band.step)), id: \.self) { radius in
+                    let normalized = (radius - 196.0) / (338.0 - 196.0)
+                    let grooveColor = SwiftUI.Color(
+                        red: 0.18 + (0.16 * normalized),
+                        green: 0.20 + (0.18 * normalized),
+                        blue: 0.24 + (0.22 * normalized)
+                    )
+                    Circle()
+                        .stroke(grooveColor.opacity(band.opacity), lineWidth: bandIndex == 0 || bandIndex == grooveBands.count - 1 ? 1.1 : 0.95)
+                        .frame(width: radius * 2, height: radius * 2)
+                        .rotationEffect(.degrees(spinning ? 360 : 0))
+                        .animation(spinning ? .linear(duration: 2.4).repeatForever(autoreverses: false) : .default, value: spinning)
+                }
+            }
+
+            Circle()
+                .fill(SwiftUI.Color(red: 0.05, green: 0.06, blue: 0.08))
+                .frame(width: 390, height: 390)
+                .overlay {
+                    Circle()
+                        .stroke(SwiftUI.Color(red: 0.46, green: 0.50, blue: 0.57).opacity(0.4), lineWidth: 6)
+                }
+                .rotationEffect(.degrees(spinning ? 360 : 0))
+                .animation(spinning ? .linear(duration: 2.4).repeatForever(autoreverses: false) : .default, value: spinning)
+
+            Circle()
+                .fill(SwiftUI.Color(red: 0.78, green: 0.23, blue: 0.28))
+                .frame(width: 324, height: 324)
+                .overlay {
+                    Circle()
+                        .stroke(SwiftUI.Color(red: 0.94, green: 0.84, blue: 0.82), lineWidth: 4)
+                }
+                .rotationEffect(.degrees(spinning ? 360 : 0))
+                .animation(spinning ? .linear(duration: 2.4).repeatForever(autoreverses: false) : .default, value: spinning)
+
+            ZStack {
+                Text("RSD")
+                    .font(.custom("RCA", size: 56))
+                    .tracking(-0.6)
+                    .foregroundStyle(SwiftUI.Color(red: 0.97, green: 0.91, blue: 0.89))
+                    .shadow(color: SwiftUI.Color(red: 0.90, green: 0.81, blue: 0.79).opacity(0.28), radius: 1, y: 1)
+                    .offset(y: -114)
+
+                Text("assistant")
+                    .font(.custom("RCA", size: 18))
+                    .tracking(0.2)
+                    .foregroundStyle(SwiftUI.Color(red: 0.97, green: 0.91, blue: 0.89))
+                    .scaleEffect(x: 1.04, y: 1, anchor: .center)
+                    .offset(y: -82)
+            }
+            .rotationEffect(.degrees(spinning ? 360 : 0))
+            .animation(spinning ? .linear(duration: 2.4).repeatForever(autoreverses: false) : .default, value: spinning)
+
+            HStack(spacing: 90) {
+                VStack(spacing: 60) {
+                    Capsule().fill(SwiftUI.Color(red: 0.94, green: 0.84, blue: 0.82)).frame(width: 114, height: 3)
+                    Capsule().fill(SwiftUI.Color(red: 0.94, green: 0.84, blue: 0.82)).frame(width: 114, height: 3)
+                }
+                VStack(spacing: 60) {
+                    Capsule().fill(SwiftUI.Color(red: 0.94, green: 0.84, blue: 0.82)).frame(width: 114, height: 3)
+                    Capsule().fill(SwiftUI.Color(red: 0.94, green: 0.84, blue: 0.82)).frame(width: 114, height: 3)
+                }
+            }
+            .rotationEffect(.degrees(spinning ? 360 : 0))
+            .animation(spinning ? .linear(duration: 2.4).repeatForever(autoreverses: false) : .default, value: spinning)
+
+            Circle()
+                .stroke(SwiftUI.Color(red: 0.94, green: 0.84, blue: 0.82), lineWidth: 2)
+                .frame(width: 54 * 2, height: 54 * 2)
+                .rotationEffect(.degrees(spinning ? 360 : 0))
+                .animation(spinning ? .linear(duration: 2.4).repeatForever(autoreverses: false) : .default, value: spinning)
+
+            Circle()
+                .fill(SwiftUI.Color(red: 0.05, green: 0.06, blue: 0.08))
+                .frame(width: 24, height: 24)
+                .rotationEffect(.degrees(spinning ? 360 : 0))
+                .animation(spinning ? .linear(duration: 2.4).repeatForever(autoreverses: false) : .default, value: spinning)
+        }
+        .frame(width: 820, height: 820)
+        .drawingGroup()
     }
 }
 

@@ -321,10 +321,10 @@
             </objects>
             <point key="canvasLocation" x="1921.875" y="-1297.1830985915492"/>
         </scene>
-        <!--Favorites-->
+        <!--Wishlist-->
         <scene sceneID="5o7-Ez-xEn">
             <objects>
-                <viewController storyboardIdentifier="RSDFavoritesViewController" title="Favorites" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Dua-Oq-932" customClass="RSDFavoritesViewController" customModule="RSD_Helper" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="RSDFavoritesViewController" title="Wishlist" automaticallyAdjustsScrollViewInsets="NO" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Dua-Oq-932" customClass="RSDFavoritesViewController" customModule="RSD_Helper" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="Gre-mA-RHW"/>
                         <viewControllerLayoutGuide type="bottom" id="JDz-mm-lT4"/>

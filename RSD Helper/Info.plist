@@ -35,11 +35,11 @@
 	<array>
 		<dict>
 			<key>UIApplicationShortcutItemIconType</key>
-			<string>UIApplicationShortcutIconTypeLove</string>
+			<string>UIApplicationShortcutIconTypeBookmark</string>
 			<key>UIApplicationShortcutItemTitle</key>
-			<string>Favorites</string>
+			<string>Wishlist</string>
 			<key>UIApplicationShortcutItemType</key>
-			<string>$(PRODUCT_BUNDLE_IDENTIFIER).Favorites</string>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).Wishlist</string>
 		</dict>
 		<dict>
 			<key>UIApplicationShortcutItemIconType</key>
@@ -49,6 +49,10 @@
 			<key>UIApplicationShortcutItemType</key>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER).Stores</string>
 		</dict>
+	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>RCA.TTF</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

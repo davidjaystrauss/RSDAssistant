@@ -57,6 +57,7 @@
 		B9F0E2A41EA1F83800F1B1EF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B9F0E2A21EA1F83800F1B1EF /* Main.storyboard */; };
 		B9F0E2A61EA1F83800F1B1EF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9F0E2A51EA1F83800F1B1EF /* Assets.xcassets */; };
 		B9F0E2A91EA1F83800F1B1EF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B9F0E2A71EA1F83800F1B1EF /* LaunchScreen.storyboard */; };
+		C0A1F0012BFC900100A10001 /* RCA.TTF in Resources */ = {isa = PBXBuildFile; fileRef = C0A1F0002BFC900100A10001 /* RCA.TTF */; };
 		B9F0E2B41EA1F83800F1B1EF /* RSD_HelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F0E2B31EA1F83800F1B1EF /* RSD_HelperTests.swift */; };
 		B9F0E2BF1EA1F83900F1B1EF /* RSD_HelperUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9F0E2BE1EA1F83900F1B1EF /* RSD_HelperUITests.swift */; };
 		B9F0E2CD1EA1FC4C00F1B1EF /* rsd.csv in Resources */ = {isa = PBXBuildFile; fileRef = B9F0E2CC1EA1FC4C00F1B1EF /* rsd.csv */; };
@@ -174,6 +175,7 @@
 		B9F0E2A51EA1F83800F1B1EF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B9F0E2A81EA1F83800F1B1EF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B9F0E2AA1EA1F83800F1B1EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C0A1F0002BFC900100A10001 /* RCA.TTF */ = {isa = PBXFileReference; lastKnownFileType = file; path = RCA.TTF; sourceTree = "<group>"; };
 		B9F0E2AF1EA1F83800F1B1EF /* RSD HelperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "RSD HelperTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9F0E2B31EA1F83800F1B1EF /* RSD_HelperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RSD_HelperTests.swift; sourceTree = "<group>"; };
 		B9F0E2B51EA1F83800F1B1EF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -374,6 +376,7 @@
 				C00120331EA1F83800F1B1EF /* data/stores-2026.json */,
 				B9F0E29E1EA1F83800F1B1EF /* AppDelegate.swift */,
 				B9F0E2A01EA1F83800F1B1EF /* RSDViewController.swift */,
+				C0A1F0002BFC900100A10001 /* RCA.TTF */,
 				B9F1AB792022DF7C0055AA61 /* ParticipatingStores.swift */,
 				B9F0E2D01EA1FEF900F1B1EF /* RSDTableViewCell.swift */,
 				B9418A0C1ED55E3300676F7E /* RSDCollectionViewCell.swift */,
@@ -539,6 +542,7 @@
 				B9FB6CFE1FB2AEB900424459 /* data/releases/rsd-black-friday-2017.enriched.json in Resources */,
 				B9F0E2A91EA1F83800F1B1EF /* LaunchScreen.storyboard in Resources */,
 				B9F0E2A61EA1F83800F1B1EF /* Assets.xcassets in Resources */,
+				C0A1F0012BFC900100A10001 /* RCA.TTF in Resources */,
 				B9F0E2CD1EA1FC4C00F1B1EF /* rsd.csv in Resources */,
 				B9F0E3031EA2999000F1B1EF /* data/releases/rsd-2017.enriched.json in Resources */,
 				B92E80BB1EA7B9F600389DF8 /* RSDSearchHeaderView.xib in Resources */,
@@ -818,9 +822,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FY6K74QNM5;
 				INFOPLIST_FILE = "RSD Helper/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.1.0;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.dstrauss.RSD-Helper";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -842,9 +846,9 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FY6K74QNM5;
 				INFOPLIST_FILE = "RSD Helper/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.0.0;
+				MARKETING_VERSION = 3.1.0;
 				OTHER_LDFLAGS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.dstrauss.RSD-Helper";
 				PRODUCT_NAME = "$(TARGET_NAME)";

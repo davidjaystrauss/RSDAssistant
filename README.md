@@ -211,7 +211,10 @@ Branding and icon exploration lives in:
 - add a one-tap `Reset filters and sort` action in releases
 - add a `Favorites first` or `Hide favorited` browsing mode for the main releases list
 - improve empty states for filtered stores and empty-search results
+- add app-string localization infrastructure (`Localizable.strings` / localized SwiftUI strings)
+- localize core app chrome for list browsing, favorites, stores, export, and settings surfaces
 - run a final accessibility pass for Dynamic Type, VoiceOver labels, and contrast
+- add explicit accessibility labels/hints for custom controls, cover flow, map controls, and placeholder art
 - run a final resize/layout pass on iPhone, iPad, and Mac Catalyst across list, grid, and cover flow
 
 ## License / Ownership

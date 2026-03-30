@@ -12,6 +12,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
@@ -50,6 +51,7 @@ REGION_CONFIG = {
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 LABEL_SOURCE_DIR = PROJECT_ROOT / "data" / "releases"
+AU_DEFAULT_IMAGE_URL = "https://recordstoreday.com.au/wp-content/uploads/2025/03/social.jpg"
 
 
 def fetch_text(url: str) -> str:
@@ -383,6 +385,38 @@ FileHandle.standardOutput.write(data)
     )
     pages = json.loads(result.stdout)
     return [line for page in pages for line in page]
+
+
+def extract_pdf_layout_blocks(pdf_path: Path) -> list[list[dict]]:
+    result = subprocess.run(
+        ["pdftotext", "-bbox-layout", str(pdf_path), "-"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    root = ET.fromstring(result.stdout)
+    namespace = {"x": "http://www.w3.org/1999/xhtml"}
+    pages: list[list[dict]] = []
+
+    for page in root.findall(".//x:page", namespace):
+        blocks: list[dict] = []
+        for block in page.findall(".//x:block", namespace):
+            words = [(word.text or "") for word in block.findall(".//x:word", namespace)]
+            text = " ".join(words).strip()
+            if not text or text == "\u200b":
+                continue
+            blocks.append(
+                {
+                    "text": text,
+                    "xMin": float(block.attrib["xMin"]),
+                    "xMax": float(block.attrib["xMax"]),
+                    "yMin": float(block.attrib["yMin"]),
+                    "yMax": float(block.attrib["yMax"]),
+                }
+            )
+        pages.append(blocks)
+
+    return pages
 
 
 US_HEADER_PREFIXES = (
@@ -742,6 +776,407 @@ def import_us_pdf(source_path: Path) -> list[dict]:
     return dedupe_releases(releases)
 
 
+AU_PDF_COLUMNS = (
+    ("artist", 0, 220),
+    ("title", 220, 355),
+    ("format", 355, 410),
+    ("label", 410, 1000),
+)
+
+AU_WRAP_REPAIRS = {
+    "12Ó": "12\"",
+    "RED/BLU E": "RED/BLUE",
+    "TRANSPA RENT": "TRANSPARENT",
+    "WHITE/B LACK": "WHITE/BLACK",
+    "UNDERCOV ER": "UNDERCOVER",
+    "RE-VINYL": "REVINYL",
+}
+
+AU_PACKAGE_FORMAT_PATTERNS = [
+    r"\d+\s*x\s*LP",
+    r"\d+\s*x\s*CD",
+    r"\d+LP(?:\([^)]+\))?",
+    r"\d+CD",
+    r"LP(?:\([^)]+\))?",
+    r"CD",
+    r"12\"(?:\s+\w+)?",
+    r"10\"(?:\s+\w+)?",
+    r"7\"(?:\s+\w+)?",
+    r"12in(?:EP)?",
+    r"10in",
+    r"7in",
+    r"Cassette(?:\s*\([^)]+\))?",
+    r"Vinyl Box Set",
+]
+
+AU_MARKETING_TAG_PATTERNS = [
+    ("RSD Exclusive", r"RSD EXCLUSIVE"),
+    ("Limited", r"\bLIMITED\b"),
+    ("First Time on Vinyl", r"FIRST TIME ON VINYL"),
+    ("Indie Exclusive", r"INDIE EXCLUSIVE"),
+    ("Deluxe Edition", r"DELUXE EDITION"),
+    ("Anniversary Edition", r"ANNIVERSARY"),
+    ("Signed Print", r"SIGNED PRINT"),
+]
+
+AU_MANUAL_RELEASE_OVERRIDES = {
+    ("DOPE (JOHN DENSMORE &", "NO COUNTRY FOR OLD"): {
+        "artist": "DOPE (JOHN DENSMORE & CHUCK D)",
+        "title": "NO COUNTRY FOR OLD MEN (LIMITED OXBLOOD DOCS COLOURED VINYL) - RSD 2026",
+    },
+    ("Orchestral Manoeuvres In The", "Archive Vol. 1"): {
+        "artist": "Orchestral Manoeuvres In The Dark",
+        "title": "Archive Vol. 1",
+    },
+    ("Human League, The", "Being Boiled (TRANSPARENT ORANGE VINYL) 12\""): {
+        "title": "Being Boiled (TRANSPARENT ORANGE VINYL)",
+        "format": "12\"EP",
+    },
+    ("DARKTHRONE", "AS WOLVES AMONG SHEEP - LIVE IN OSLO LP(180G) '90 (LIMITED PETROL BLUE VINYL) - RSD 2026"): {
+        "title": "AS WOLVES AMONG SHEEP - LIVE IN OSLO '90 (LIMITED PETROL BLUE VINYL) - RSD 2026",
+        "format": "LP(180G)",
+    },
+    ("LENKER, ADRIANNE", "LIVE AT REVOLUTION 3LP(GATE HALL (VINYL) - RSD 2026 FOLD)"): {
+        "title": "LIVE AT REVOLUTION HALL (VINYL) - RSD 2026",
+        "format": "3LP(GATEFOLD)",
+    },
+    ("The Heliocentrics, Marshall Allen and Knoel Scott Ft. Bilal", "Nuclear War YELLOW & ORANGE VINYL)"): {
+        "title": "Nuclear War (YELLOW & ORANGE VINYL)",
+    },
+    ("The Power Station", "Raw Power: Live At The Spectrum, Philadelphia, 12\" Black PA, 21/8/85"): {
+        "title": "Raw Power: Live At The Spectrum, Philadelphia, PA, 21/8/85",
+        "format": "12\" Black",
+    },
+    ("XTC", "LIVE BOOTS EMERALD CITY, CHERRY HILL, NEW 2LP(180G JERSEY 17TH APRIL ) 1981 (VINYL) - RSD 2026"): {
+        "title": "LIVE BOOTS EMERALD CITY, CHERRY HILL, NEW JERSEY 17TH APRIL 1981 (VINYL) - RSD 2026",
+        "format": "2LP(180G)",
+    },
+}
+
+
+def au_pdf_column_name(block: dict) -> str | None:
+    midpoint = (block["xMin"] + block["xMax"]) / 2
+    for name, left, right in AU_PDF_COLUMNS:
+        if left <= midpoint < right:
+            return name
+    return None
+
+
+def au_pdf_reference_key(artist: str, title: str) -> tuple[str, str]:
+    return (
+        normalize_match_text(artist),
+        normalize_match_text(title),
+    )
+
+
+def au_pdf_title_tokens(value: str) -> set[str]:
+    normalized = normalize_match_text(value)
+    tokens = [token for token in normalized.split() if len(token) > 1 and token not in {"rsd", "exclusive", "limited", "vinyl"}]
+    return set(tokens)
+
+
+def load_release_document(path: Path) -> dict:
+    with path.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def au_find_reference_release(release: dict, references_by_artist: dict[str, list[dict]]) -> dict | None:
+    artist_key = normalize_match_text(release["artist"])
+    title_key = normalize_match_text(release["title"])
+    title_tokens = au_pdf_title_tokens(release["title"])
+    candidates = references_by_artist.get(artist_key, [])
+    best_score = -1
+    best_match = None
+
+    for candidate in candidates:
+        candidate_title_key = normalize_match_text(candidate.get("title", ""))
+        candidate_title_tokens = au_pdf_title_tokens(candidate.get("title", ""))
+        score = 0
+
+        if title_key == candidate_title_key:
+            score += 100
+
+        overlap = len(title_tokens & candidate_title_tokens)
+        if overlap:
+            score += overlap * 12
+
+        if candidate.get("label") and release.get("label") and normalize_label_key(candidate["label"]) == normalize_label_key(release["label"]):
+            score += 10
+
+        if candidate.get("format") and release.get("format"):
+            candidate_format = normalize_match_text(candidate["format"])
+            release_format = normalize_match_text(release["format"])
+            if candidate_format == release_format:
+                score += 8
+            elif candidate_format in release_format or release_format in candidate_format:
+                score += 4
+
+        if score > best_score:
+            best_score = score
+            best_match = candidate
+
+    if best_score < 20:
+        return None
+    return best_match
+
+
+def build_references_by_artist(*documents: dict) -> dict[str, list[dict]]:
+    references: dict[str, list[dict]] = {}
+    for document in documents:
+        for release in document.get("releases", []):
+            artist_key = normalize_match_text(str(release.get("artist", "")))
+            if not artist_key:
+                continue
+            references.setdefault(artist_key, []).append(release)
+    return references
+
+
+def repair_au_pdf_text(value: str) -> str:
+    repaired = re.sub(r"\s+", " ", value).strip()
+    for source, target in AU_WRAP_REPAIRS.items():
+        repaired = repaired.replace(source, target)
+    return repaired
+
+
+def extract_au_package_format(raw_format: str) -> tuple[str, str]:
+    cleaned = repair_au_pdf_text(raw_format)
+    for pattern in AU_PACKAGE_FORMAT_PATTERNS:
+        match = re.search(pattern, cleaned, flags=re.IGNORECASE)
+        if not match:
+            continue
+        package_format = match.group(0).strip()
+        remainder = f"{cleaned[:match.start()]} {cleaned[match.end():]}".strip(" -,+/")
+        return package_format, remainder
+    return cleaned or "Unknown", ""
+
+
+def extract_au_marketing_tags(*values: str) -> list[str]:
+    text = " ".join(repair_au_pdf_text(value) for value in values if value).upper()
+    tags: list[str] = []
+    for label, pattern in AU_MARKETING_TAG_PATTERNS:
+        if re.search(pattern, text, flags=re.IGNORECASE) and label not in tags:
+            tags.append(label)
+    return tags
+
+
+def clean_au_variant_text(value: str, marketing_tags: list[str]) -> str:
+    cleaned = repair_au_pdf_text(value)
+    cleaned = re.sub(r"\bRSD\s*2026\b", " ", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\bRECORD STORE DAY 2026\b", " ", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\b2026\b", " ", cleaned, flags=re.IGNORECASE)
+    for tag in marketing_tags:
+        cleaned = re.sub(re.escape(tag), " ", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\bLIMITED\b", " ", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\bFIRST TIME ON VINYL\b", " ", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\bINDIE EXCLUSIVE\b", " ", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\bANNIVERSARY(?: EDITION)?\b", " ", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\bDELUXE EDITION\b", " ", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"[()]", " ", cleaned)
+    cleaned = re.sub(r"\s+", " ", cleaned)
+    return cleaned.strip(" -,:;/")
+
+
+def extract_au_variant(raw_title: str, raw_format: str, package_format: str, marketing_tags: list[str]) -> str | None:
+    variant_parts: list[str] = []
+    for fragment in re.findall(r"\(([^)]+)\)", raw_title):
+        cleaned_fragment = clean_au_variant_text(fragment, marketing_tags)
+        if not cleaned_fragment:
+            continue
+        if re.fullmatch(r"\d{4}", cleaned_fragment):
+            continue
+        if normalize_match_text(cleaned_fragment) == normalize_match_text(package_format):
+            continue
+        if cleaned_fragment not in variant_parts:
+            variant_parts.append(cleaned_fragment)
+
+    _, format_remainder = extract_au_package_format(raw_format)
+    cleaned_remainder = clean_au_variant_text(format_remainder, marketing_tags)
+    if cleaned_remainder and not re.fullmatch(r"\d{4}", cleaned_remainder) and cleaned_remainder not in variant_parts:
+        variant_parts.append(cleaned_remainder)
+
+    if not variant_parts:
+        return None
+    return " / ".join(variant_parts)
+
+
+def availability_scope_for_section(section: str) -> str:
+    if section == "local":
+        return "Australia local"
+    if section == "twaujp":
+        return "TW/AU/JP exclusive"
+    return "Australia international"
+
+
+def apply_au_manual_override(artist: str, title: str, fmt: str, label: str) -> tuple[str, str, str, str]:
+    override = AU_MANUAL_RELEASE_OVERRIDES.get((artist, title))
+    if not override:
+        return artist, title, fmt, label
+    return (
+        override.get("artist", artist),
+        override.get("title", title),
+        override.get("format", fmt),
+        override.get("label", label),
+    )
+
+
+def parse_australia_pdf(source_path: Path) -> list[dict]:
+    pages = extract_pdf_layout_blocks(source_path)
+    current_section = None
+    parsed_rows: list[dict] = []
+
+    for page_index, page_blocks in enumerate(pages):
+        content_blocks: list[dict] = []
+        for block in sorted(page_blocks, key=lambda item: (item["yMin"], item["xMin"])):
+            text = block["text"].strip()
+            if (
+                text.startswith("These titles will be released")
+                or text.startswith("The RECORD DAY AUSTRALIA website does NOT sell them.")
+                or text.startswith("* PLEASE CONTACT YOUR LOCAL INDIE STORE")
+                or text in {"TITLE", "FORMAT", "LABEL"}
+            ):
+                continue
+            if text == "LOCAL ARTIST":
+                current_section = "local"
+                continue
+            if text.startswith("( TW/AU/JP) EXCLUSIVE ARTIST"):
+                current_section = "twaujp"
+                continue
+            if text.startswith("INTERNATIONAL ARTIST"):
+                current_section = "international"
+                continue
+
+            column = au_pdf_column_name(block)
+            if column is None or current_section is None:
+                continue
+            content_blocks.append({**block, "column": column, "section": current_section, "page": page_index})
+
+        artist_blocks = [block for block in content_blocks if block["column"] == "artist"]
+        page_rows = [
+            {
+                "section": block["section"],
+                "artist": block["text"],
+                "title": "",
+                "format": "",
+                "label": "",
+                "yMin": block["yMin"],
+                "yMax": block["yMax"],
+            }
+            for block in artist_blocks
+        ]
+        page_rows.sort(key=lambda row: row["yMin"])
+
+        for block in content_blocks:
+            if block["column"] == "artist":
+                continue
+
+            if not page_rows:
+                if parsed_rows and parsed_rows[-1]["section"] == block["section"]:
+                    existing = parsed_rows[-1][block["column"]]
+                    parsed_rows[-1][block["column"]] = f"{existing} {block['text']}".strip() if existing else block["text"]
+                continue
+
+            if block["yMax"] < page_rows[0]["yMin"] - 5:
+                if parsed_rows and parsed_rows[-1]["section"] == block["section"]:
+                    existing = parsed_rows[-1][block["column"]]
+                    parsed_rows[-1][block["column"]] = f"{existing} {block['text']}".strip() if existing else block["text"]
+                continue
+
+            block_center = (block["yMin"] + block["yMax"]) / 2
+
+            def row_score(row: dict) -> tuple[float, float]:
+                overlap = min(block["yMax"], row["yMax"]) - max(block["yMin"], row["yMin"])
+                row_center = (row["yMin"] + row["yMax"]) / 2
+                return (overlap, -abs(block_center - row_center))
+
+            target_row = max(
+                (row for row in page_rows if row["section"] == block["section"]),
+                key=row_score,
+            )
+            existing = target_row[block["column"]]
+            target_row[block["column"]] = f"{existing} {block['text']}".strip() if existing else block["text"]
+            target_row["yMin"] = min(target_row["yMin"], block["yMin"])
+            target_row["yMax"] = max(target_row["yMax"], block["yMax"])
+
+        parsed_rows.extend(page_rows)
+
+    return [
+        row
+        for row in parsed_rows
+        if row["artist"].strip() and row["title"].strip()
+    ]
+
+
+def import_australia_pdf(source_path: Path) -> list[dict]:
+    parsed_rows = parse_australia_pdf(source_path)
+    existing_document = release_document("australia", import_australia((PROJECT_ROOT / "data" / "source_cache" / "australia-2026.html").read_text(encoding="utf-8", errors="ignore")))
+    us_document = load_release_document(PROJECT_ROOT / "data" / "releases" / "rsd-2026-us.json")
+    existing_by_key = {
+        au_pdf_reference_key(release["artist"], release["title"]): release
+        for release in existing_document["releases"]
+    }
+    references_by_artist = build_references_by_artist(existing_document, us_document)
+
+    releases = []
+    for row in parsed_rows:
+        raw_artist = repair_au_pdf_text(row["artist"])
+        raw_title = repair_au_pdf_text(row["title"])
+        raw_format = repair_au_pdf_text(row["format"])
+        raw_label = repair_au_pdf_text(row["label"])
+        raw_artist, raw_title, raw_format, raw_label = apply_au_manual_override(
+            raw_artist,
+            raw_title,
+            raw_format,
+            raw_label,
+        )
+        marketing_tags = extract_au_marketing_tags(raw_title, raw_format)
+        package_format, _ = extract_au_package_format(raw_format)
+        edition_variant = extract_au_variant(raw_title, raw_format, package_format, marketing_tags)
+        details = (
+            "Official Record Store Day Australia 2026 release imported from the Australia PDF list."
+            if row["section"] != "international"
+            else "Official Record Store Day Australia 2026 international title imported from the Australia PDF list."
+        )
+        release = base_release(
+            artist=raw_artist,
+            title=raw_title,
+            fmt=raw_format,
+            label=raw_label or "Unknown",
+            details=details,
+            image_url=AU_DEFAULT_IMAGE_URL,
+            source_url=REGION_CONFIG["australia"]["source_url"],
+            release_type="australian-release" if row["section"] in {"local", "twaujp"} else None,
+        )
+        release["rawTitle"] = raw_title
+        release["rawFormat"] = raw_format
+        release["rawLabel"] = raw_label or "Unknown"
+        release["packageFormat"] = package_format
+        release["editionVariant"] = edition_variant
+        release["marketingTags"] = marketing_tags
+        release["sourceSection"] = row["section"]
+        release["availabilityScope"] = availability_scope_for_section(row["section"])
+
+        exact_match = existing_by_key.get(au_pdf_reference_key(release["artist"], release["title"]))
+        if exact_match:
+            release = merge_release_records(release, exact_match)
+            if exact_match.get("appleMusic") is not None:
+                release["appleMusic"] = exact_match["appleMusic"]
+            if exact_match.get("spotify") is not None:
+                release["spotify"] = exact_match["spotify"]
+        else:
+            reference_match = au_find_reference_release(release, references_by_artist)
+            if reference_match:
+                if reference_match.get("imageURL"):
+                    release["imageURL"] = reference_match["imageURL"]
+                if reference_match.get("appleMusic") is not None:
+                    release["appleMusic"] = reference_match["appleMusic"]
+                if reference_match.get("spotify") is not None:
+                    release["spotify"] = reference_match["spotify"]
+
+        releases.append(release)
+
+    return dedupe_releases(releases)
+
+
 def parse_canada_list(html_text: str) -> list[dict]:
     row_pattern = re.compile(
         r'<tr[^>]*>\s*<td></td>\s*'
@@ -1007,7 +1442,10 @@ def main() -> int:
     elif args.region == "uk":
         releases = import_uk(source_text, cache_dir, args.refresh, args.sleep_ms)
     elif args.region == "australia":
-        releases = import_australia(source_text)
+        if source_path.suffix.lower() == ".pdf":
+            releases = import_australia_pdf(source_path)
+        else:
+            releases = import_australia(source_text)
     else:
         raise ValueError(f"Unsupported region: {args.region}")
 
